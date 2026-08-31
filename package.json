@@ -1,0 +1,12 @@
+{
+  "name": "saju-mbti",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Korean Saju (Four Pillars) x MBTI. VSOP87-based ephemeris, innate-type derivation, and a read on what your environment changed. Runs entirely in the browser.",
+  "keywords": ["saju", "four-pillars", "bazi", "mbti", "manseryeok", "lunar-calendar", "vsop87", "korean-astrology"],
+  "license": "MIT",
+  "scripts": {
+    "build": "node build.js",
+    "serve": "node server.js"
+  }
+}

@@ -1,0 +1,486 @@
+<title>사주팔자 × MBTI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Noto+Serif+KR:wght@500;600;700&display=swap">
+
+<style>
+/* ===== 한지·목판 활자 — 라이트 전용 ===== */
+:root{
+  --paper:#F8F2E2; --paper-2:#F1E8D2; --surface:#FDFAF0;
+  --rule:#D6C8A6; --rule-soft:#E6DBBF; --frame:#5A4A32;
+  --ink:#1B1813; --ink-2:#38332A; --muted:#655C46;
+  --red:#B93A2B; --red-soft:#F8E9E3; --red-deep:#8E2A1E;
+  --cheong:#2A6670;
+  --el-mok:#2E7358; --el-hwa:#B93A2B; --el-to:#B5872A; --el-geum:#847C66; --el-su:#2A4F6B;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--ink);
+  background-color:var(--paper);
+  /* 한옥 문살(띠살) + 한지 섬유 */
+  background-image:
+    repeating-linear-gradient(90deg, rgba(90,74,50,.028) 0 1px, transparent 1px 38px),
+    repeating-linear-gradient(0deg, rgba(90,74,50,.02) 0 1px, transparent 1px 38px),
+    radial-gradient(circle at 18% 32%, rgba(90,74,50,.05) 0 .8px, transparent .8px),
+    radial-gradient(circle at 72% 64%, rgba(90,74,50,.04) 0 .8px, transparent .8px);
+  background-size:auto, auto, 7px 7px, 11px 11px;
+  font-family:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  font-size:15px; line-height:1.75; -webkit-text-size-adjust:100%;
+  word-break:keep-all; overflow-wrap:break-word;
+}
+.wrap{max-width:552px; margin:0 auto; padding:0 20px 80px}
+h1,h2,h3{
+  font-family:"Nanum Myeongjo","Gowun Batang",serif; font-weight:800; text-wrap:balance;
+  margin:0; line-height:1.42; letter-spacing:-.008em;
+  text-shadow:0 0 .35px currentColor;            /* 활자 압인 */
+}
+.hanja{font-family:"Noto Serif KR",serif; font-weight:700; text-shadow:0 0 .35px currentColor}
+
+/* ===== 판심 어미(魚尾) 구분 ===== */
+.eomi{position:relative; height:20px; margin:22px 0 8px}
+.eomi::before{content:""; position:absolute; left:0; right:0; top:9px; height:1px; background:var(--rule)}
+.eomi::after{
+  content:""; position:absolute; left:50%; top:0; width:30px; height:20px; margin-left:-15px;
+  background:var(--paper);
+}
+.eomi i{
+  position:absolute; left:50%; top:4px; margin-left:-7px; width:0; height:0; z-index:1;
+  border-left:7px solid transparent; border-right:7px solid transparent;
+  border-top:10px solid var(--frame);
+}
+
+/* ===== 표제 ===== */
+header{padding:46px 0 30px}
+.brand{
+  font-size:10.5px; letter-spacing:.28em; text-transform:uppercase;
+  color:var(--muted); padding-bottom:16px; border-bottom:3px double var(--frame);
+  margin-bottom:20px;
+}
+header h1{font-size:34px}
+header h1 .x{color:var(--red); font-style:normal; padding:0 .1em; font-weight:400}
+header p{
+  color:var(--ink-2); font-size:14px; margin:18px 0 0; max-width:30em; line-height:1.9;
+  padding-top:17px; border-top:1px solid var(--rule);
+}
+
+/* ===== 광곽(匡郭) — 사주쌍변 ===== */
+.card:not(.sec){
+  background:var(--surface); border:2px solid var(--frame); border-radius:0;
+  box-shadow:inset 0 0 0 2px var(--surface), inset 0 0 0 3px var(--rule);
+  padding:20px 18px;
+}
+/* 판제(板題) 머리띠 */
+.card:not(.sec) > .label{
+  display:flex; align-items:center; gap:9px;
+  background:var(--frame); color:#F8F2E2;
+  margin:0 0 17px; padding:8px 12px; font-size:11px; letter-spacing:.16em;
+}
+.card:not(.sec) > .label em{
+  font-family:"Noto Serif KR",serif; font-weight:700; font-style:normal;
+  font-size:13px; letter-spacing:.1em; color:#F0DFC0;
+}
+.card.sec{
+  background:var(--surface); border:1px solid var(--frame); border-radius:0;
+  box-shadow:inset 0 0 0 2px var(--surface), inset 0 0 0 3px var(--rule-soft);
+  padding:24px 20px; margin-top:14px;
+}
+.stack{display:flex; flex-direction:column; gap:17px}
+
+/* ===== 입력 ===== */
+.field{display:flex; flex-direction:column; gap:9px}
+.field > .label{font-size:11px; letter-spacing:.16em; color:var(--red)}
+.seg{display:flex; border:1px solid var(--frame); overflow:hidden}
+.seg button{
+  flex:1; appearance:none; border:0; border-right:1px solid var(--frame); background:var(--surface);
+  color:var(--ink-2); font-family:inherit; font-size:14px; padding:10px 4px; cursor:pointer;
+  transition:background .14s, color .14s;
+}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--frame); color:#F8F2E2}
+.seg button:focus-visible{outline:2px solid var(--red); outline-offset:-2px}
+.row{display:grid; gap:7px}
+.row.d3{grid-template-columns:1.3fr 1fr 1fr}
+.row.d2{grid-template-columns:1fr 1fr}
+select,input[type="text"]{
+  width:100%; appearance:none; font-family:inherit; font-size:15px; color:var(--ink);
+  background:var(--paper-2); border:1px solid var(--rule); border-radius:0;
+  padding:10px 28px 10px 11px; cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+  background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+}
+input[type="text"]{background-image:none; padding-right:11px; cursor:text}
+select:focus-visible,input:focus-visible{outline:2px solid var(--red); outline-offset:-1px}
+.check{display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--ink-2); cursor:pointer; user-select:none}
+.check input{width:16px; height:16px; accent-color:var(--red); cursor:pointer; margin:0}
+.hint{font-size:12.5px; color:var(--muted); line-height:1.75}
+
+.mbti-grid{display:flex; flex-direction:column; gap:6px}
+.axis{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+.axis button{
+  appearance:none; border:1px solid var(--rule); background:var(--surface); color:var(--muted);
+  font-family:inherit; padding:10px 6px; border-radius:0; cursor:pointer; font-size:12.5px;
+  display:flex; flex-direction:column; align-items:center; gap:2px; transition:all .14s;
+}
+.axis button b{
+  font-family:"Nanum Myeongjo",serif; font-size:19px; font-weight:800;
+  color:var(--ink-2); line-height:1.1; text-shadow:0 0 .3px currentColor;
+}
+.axis button[aria-pressed="true"]{border-color:var(--red); background:var(--red-soft); color:var(--ink-2)}
+.axis button[aria-pressed="true"] b{color:var(--red)}
+.axis button:focus-visible{outline:2px solid var(--red); outline-offset:1px}
+.mbti-out{
+  text-align:center; font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:28px;
+  letter-spacing:.17em; color:var(--ink); padding-top:7px; text-shadow:0 0 .35px currentColor;
+}
+
+.cta{
+  width:100%; appearance:none; border:2px solid var(--red-deep); border-radius:0;
+  background:var(--red); color:#FFF6E8;
+  font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:18px; padding:15px; cursor:pointer;
+  letter-spacing:.08em; transition:background .14s, transform .06s;
+}
+.cta:hover{background:var(--red-deep)}
+.cta:active{transform:translateY(1px)}
+.cta:disabled{background:var(--paper-2); border-color:var(--rule); color:var(--muted); cursor:not-allowed}
+.cta:focus-visible{outline:2px solid var(--frame); outline-offset:2px}
+
+details.adv{border-top:1px solid var(--rule); padding-top:16px}
+details.adv summary{cursor:pointer; font-size:13px; color:var(--muted); list-style:none; display:flex; align-items:center; gap:7px}
+details.adv summary::-webkit-details-marker{display:none}
+details.adv summary::before{content:"＋"; font-size:12px; color:var(--red)}
+details.adv[open] summary::before{content:"－"}
+details.adv .stack{margin-top:16px}
+
+/* ===== 결과 표제 + 낙관 ===== */
+#result{display:none}
+#result.on{display:block}
+.hero{padding:40px 0 6px}
+.hero .eyebrow{
+  font-size:11px; letter-spacing:.18em; color:var(--red); margin-bottom:18px;
+  padding-bottom:15px; border-bottom:3px double var(--frame);
+}
+.hero h2{font-size:32px; line-height:1.42}
+.seal{
+  float:right; width:60px; margin:3px 0 12px 18px; padding:9px 0;
+  background:var(--red); border:1px solid var(--red-deep);
+  display:flex; flex-direction:column; align-items:center; gap:1px;
+  transform:rotate(-2.5deg);
+  box-shadow:0 0 0 3px var(--paper), 0 0 0 4px rgba(185,58,43,.28);
+}
+.seal b{
+  font-family:"Noto Serif KR",serif; font-weight:700; font-size:24px; line-height:1.18;
+  color:#FFF3E2; text-shadow:0 0 .4px currentColor;
+}
+.hero-meta{margin-top:20px; font-size:12.5px; color:var(--muted); letter-spacing:.02em; clear:both; padding-top:2px}
+.hero-meta b{color:var(--ink-2); font-weight:400}
+
+.pill{
+  display:inline-block; font-size:11px; padding:2px 8px; border-radius:0;
+  background:var(--surface); border:1px solid var(--rule); color:var(--muted);
+}
+.pill.gold{border-color:var(--el-to); color:var(--el-to)}
+.pill.accent{border-color:var(--red); color:var(--red)}
+
+/* ===== 先天 · 後天 ===== */
+.codes{display:flex; align-items:stretch; border:1px solid var(--frame); overflow:hidden}
+.codebox{flex:1; text-align:center; padding:13px 5px; background:var(--paper-2); min-width:0}
+.codebox.now{background:var(--surface)}
+.codebox .ck{display:block; font-size:10.5px; color:var(--muted); letter-spacing:.05em}
+.codebox .code{
+  display:block; font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:25px;
+  letter-spacing:.14em; margin-top:5px; color:var(--ink-2); text-shadow:0 0 .35px currentColor;
+}
+.codebox.now .code{color:var(--ink)}
+.codebox .code .diff{color:var(--red); border-bottom:2px solid var(--red); padding-bottom:1px}
+.codes-arrow{
+  flex:none; display:flex; align-items:center; padding:0 12px; color:var(--red); font-size:13px;
+  border-left:1px solid var(--frame); border-right:1px solid var(--frame); background:var(--surface);
+}
+
+.cmp-legend{display:flex; gap:16px; margin-top:17px; font-size:11.5px; color:var(--muted)}
+.cmp-legend span{display:flex; align-items:center; gap:6px}
+.lg{width:9px; height:9px; flex:none}
+.lg.born{background:var(--ink); border-radius:50%}
+.lg.zone{background:var(--red-soft); border:1px solid var(--red)}
+
+.cmps{display:flex; flex-direction:column; gap:19px; margin-top:17px}
+.cmp-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:7px}
+.cmp-name{font-size:12px; color:var(--ink-2); letter-spacing:.1em; display:flex; align-items:baseline; gap:7px}
+.cmp-name .conf{font-size:10px; font-style:normal; color:var(--muted); letter-spacing:.04em}
+.cmp-tag.bd{color:var(--muted); border-color:var(--muted); background:var(--paper-2)}
+.rail .mk.bd{background:var(--muted); box-shadow:0 0 0 2px var(--paper)}
+.cmp-basis{
+  font-family:"Noto Serif KR",serif; font-weight:500; font-size:13px; line-height:1.85;
+  color:var(--muted); margin:14px 0 0; padding-top:14px; border-top:1px solid var(--rule-soft);
+}
+.cmp-basis b{color:var(--ink-2); font-weight:600}
+.cmp-tag{font-size:10.5px; padding:1px 8px; border:1px solid transparent}
+.cmp-tag.ch{background:var(--red-soft); color:var(--red-deep); border-color:var(--red)}
+.cmp-tag.sm{color:var(--muted); border-color:var(--rule)}
+.cmp-row{display:flex; align-items:center; gap:10px}
+.cmp-end{
+  font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:15px;
+  color:var(--muted); width:14px; text-align:center; flex:none;
+}
+.cmp-end.on{color:var(--red)}
+.rail{position:relative; flex:1; height:24px}
+.rail .zone{position:absolute; top:0; bottom:0; width:50%; background:var(--red-soft); border:1px solid var(--red)}
+.rail .zone.l{left:0}
+.rail .zone.r{left:50%}
+.rail .mid{position:absolute; left:0; right:0; top:11px; height:1px; background:var(--rule)}
+.rail .ctr{position:absolute; left:50%; top:2px; width:1px; height:20px; background:var(--rule)}
+.rail .mk{
+  position:absolute; top:6px; width:11px; height:11px; margin-left:-5.5px;
+  border-radius:50%; background:var(--ink); border:2px solid var(--surface); z-index:2;
+}
+.rail .mk.out{box-shadow:0 0 0 2px var(--paper)}
+.cmp-foot{display:flex; justify-content:space-between; font-size:10.5px; color:var(--muted); padding:4px 24px 0}
+.cmp-note{
+  font-family:"Noto Serif KR",serif; font-weight:500; font-size:15px; line-height:1.9;
+  color:var(--ink-2); margin:21px 0 0; padding-top:18px; border-top:1px solid var(--rule);
+}
+
+/* ===== 명식표 — 계선(界線) 격자 ===== */
+.wongook{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+  background:var(--frame); border:1px solid var(--frame); overflow:hidden;
+}
+.pil{
+  background:var(--surface); text-align:center;
+  opacity:0; transform:translateY(6px); animation:rise .45s cubic-bezier(.2,.7,.3,1) forwards;
+}
+@keyframes rise{to{opacity:1; transform:none}}
+@media (prefers-reduced-motion:reduce){.pil{animation:none; opacity:1; transform:none}}
+.pil.me{background:var(--red-soft)}
+.pil .head{
+  font-size:10px; color:var(--muted); padding:7px 2px 6px; line-height:1.55;
+  border-bottom:1px solid var(--rule); background:var(--paper-2);
+}
+.pil.me .head{color:#FFF3E2; background:var(--red); border-bottom-color:var(--red-deep)}
+.pil .glyph{padding:11px 2px 9px}
+.pil .glyph .ch{
+  display:block; font-family:"Noto Serif KR",serif; font-weight:700;
+  font-size:31px; line-height:1.15; color:var(--ink); text-shadow:0 0 .4px currentColor;
+}
+.pil.me .glyph .ch{color:var(--red-deep)}
+.pil .glyph .kr{display:block; font-size:10.5px; color:var(--muted); margin-top:2px}
+.pil .glyph .god{display:block; font-size:10.5px; color:var(--ink-2); margin-top:3px}
+.pil .divide{height:1px; background:var(--rule); margin:0 10px}
+.pil .hid{font-size:9.5px; color:var(--muted); padding:0 2px 9px}
+.meta-line{display:flex; flex-wrap:wrap; gap:5px; margin-top:14px}
+
+.obar{display:flex; height:12px; overflow:hidden; border:1px solid var(--frame)}
+.obar i{display:block}
+.okey{display:flex; flex-wrap:wrap; gap:9px; margin-top:12px; font-size:11.5px; color:var(--ink-2)}
+.okey span{display:flex; align-items:center; gap:3px; font-variant-numeric:tabular-nums}
+.okey em{
+  font-family:"Noto Serif KR",serif; font-weight:700; font-style:normal; font-size:14px;
+  text-shadow:0 0 .3px currentColor;
+}
+
+/* ===== 본문 지면 ===== */
+.sec .tag{
+  display:block; position:relative; font-size:11px; letter-spacing:.18em;
+  color:var(--sec, var(--red));
+  padding:0 0 13px; border-bottom:1px solid var(--rule); background:none;
+}
+.sec .tag::after{
+  content:""; position:absolute; left:0; bottom:-1px; width:40px; height:2px;
+  background:var(--sec, var(--red));
+}
+.sec p.soothe{border-left-color:var(--sec, var(--red))}
+.sec .chips .pill{border-color:var(--sec, var(--rule)); color:var(--sec, var(--muted))}
+.sec h3{font-size:24px; margin:19px 0 21px}
+.sec p{
+  font-family:"Noto Serif KR","Apple SD Gothic Neo",serif; font-weight:500;
+  font-size:16.5px; line-height:1.95; color:var(--ink-2);
+  margin:0 0 1.05em; letter-spacing:-.008em;
+}
+.sec p:last-of-type{margin-bottom:0}
+.sec p.lead{font-weight:600; font-size:17.5px; color:var(--ink); line-height:1.9}
+.sec p.soothe{
+  margin-top:1.5em; padding:4px 0 4px 20px; color:var(--ink);
+  border-left:3px double var(--red); background:none;
+}
+.sec p b{color:var(--ink); font-weight:700}
+.sec p.soothe{font-weight:600}
+.sec .chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:23px}
+
+/* ===== 세운 ===== */
+.fortune-head{display:flex; align-items:baseline; gap:11px; margin-bottom:17px}
+.fortune-head .y{font-family:"Nanum Myeongjo",serif; font-size:22px; font-weight:800; text-shadow:0 0 .35px currentColor}
+.tone{font-size:11px; padding:2px 9px; border:1px solid}
+.tone.순풍{color:var(--el-mok); border-color:var(--el-mok)}
+.tone.과열{color:var(--red); border-color:var(--red)}
+.tone.보통{color:var(--muted); border-color:var(--rule)}
+
+/* ===== 궁합 ===== */
+.compat{border:1px solid var(--frame); overflow:hidden}
+.cbox{padding:17px 16px; background:var(--surface); border-bottom:1px solid var(--rule)}
+.cbox:last-child{border-bottom:0}
+.cbox .t{font-size:11px; color:var(--red); letter-spacing:.13em; margin-bottom:12px}
+.cbox .list{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px}
+.cbox p{margin:0; font-family:"Noto Serif KR",serif; font-weight:500; font-size:14.5px; color:var(--ink-2); line-height:1.85}
+.tagm{
+  font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:13px; letter-spacing:.07em;
+  padding:3px 10px; background:var(--paper-2); border:1px solid var(--rule); color:var(--ink);
+}
+.tagm.gold{border-color:var(--el-to); color:var(--el-to); background:transparent}
+
+/* ===== 처방 ===== */
+.kit{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+  background:var(--frame); border:1px solid var(--frame); overflow:hidden;
+}
+.kit div{background:var(--surface); padding:13px 8px; text-align:center}
+.kit .k{font-size:10.5px; color:var(--muted)}
+.kit .v{font-size:13.5px; color:var(--ink); margin-top:3px; line-height:1.45}
+
+/* ===== 대운 ===== */
+.daeun{display:flex; gap:1px; overflow-x:auto; background:var(--frame); border:1px solid var(--frame)}
+.daeun::-webkit-scrollbar{height:4px}
+.daeun::-webkit-scrollbar-thumb{background:var(--rule)}
+.du{flex:none; width:62px; text-align:center; background:var(--surface); padding:11px 2px}
+.du.now{background:var(--red-soft)}
+.du .age{font-size:10.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+.du.now .age{color:var(--red-deep)}
+.du .gz{
+  font-family:"Noto Serif KR",serif; font-weight:700; font-size:19px; color:var(--ink);
+  margin-top:3px; line-height:1.25; text-shadow:0 0 .35px currentColor;
+}
+.du.now .gz{color:var(--red-deep)}
+.du .kr{font-size:10px; color:var(--muted)}
+
+/* ===== 액션 ===== */
+.actions{display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:26px}
+.btn2{
+  appearance:none; border:1px solid var(--frame); background:var(--surface); color:var(--ink-2);
+  font-family:inherit; font-size:14px; padding:13px; border-radius:0; cursor:pointer;
+}
+.btn2:hover{background:var(--paper-2); color:var(--ink)}
+.btn2:focus-visible{outline:2px solid var(--red); outline-offset:2px}
+
+.note{
+  font-size:12px; color:var(--muted); line-height:1.95;
+  margin-top:30px; padding-top:19px; border-top:1px solid var(--rule);
+}
+.err{
+  background:var(--red-soft); border:1px solid var(--red); color:var(--red-deep);
+  padding:11px 13px; font-size:13.5px; margin-top:10px;
+}
+.toast{
+  position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(12px);
+  background:var(--frame); color:#F8F2E2; font-size:13px;
+  padding:10px 18px; opacity:0; pointer-events:none; transition:all .25s; z-index:9;
+}
+.toast.on{opacity:1; transform:translateX(-50%)}
+
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">만세력 × 16 personalities</div>
+    <h1>사주팔자 <i class="x">×</i> MBTI</h1>
+    <p>사주는 태어날 때 받은 설계도이고, MBTI는 살아오면서 만들어진 지금의 모양입니다.<br>둘을 겹쳐 놓으면, 환경이 당신의 무엇을 바꿔놓았는지가 보여요.</p>
+  </header>
+
+  <div id="form" class="stack">
+    <div class="card stack">
+      <div class="field">
+        <span class="label">이름 <span style="font-weight:400">(선택)</span></span>
+        <input type="text" id="name" placeholder="비워둬도 괜찮아요" maxlength="12" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <span class="label">성별</span>
+        <div class="seg" id="gender" role="group" aria-label="성별">
+          <button type="button" data-v="M" aria-pressed="true">남자</button>
+          <button type="button" data-v="F" aria-pressed="false">여자</button>
+        </div>
+        <span class="hint">대운(10년 주기 흐름)의 방향을 정하는 데 씁니다.</span>
+      </div>
+
+      <div class="field">
+        <span class="label">생년월일</span>
+        <div class="seg" id="cal" role="group" aria-label="달력 종류">
+          <button type="button" data-v="solar" aria-pressed="true">양력</button>
+          <button type="button" data-v="lunar" aria-pressed="false">음력</button>
+        </div>
+        <div class="row d3">
+          <select id="by" aria-label="출생 연도"></select>
+          <select id="bm" aria-label="출생 월"></select>
+          <select id="bd" aria-label="출생 일"></select>
+        </div>
+        <label class="check" id="leapWrap" style="display:none">
+          <input type="checkbox" id="leap"> <span id="leapText">윤달</span>
+        </label>
+      </div>
+
+      <div class="field">
+        <span class="label">태어난 시각</span>
+        <div class="row d2">
+          <select id="bh" aria-label="출생 시"></select>
+          <select id="bi" aria-label="출생 분"></select>
+        </div>
+        <label class="check"><input type="checkbox" id="notime"> 시간을 몰라요 (시주 없이 봅니다)</label>
+      </div>
+
+      <details class="adv">
+        <summary>태어난 지역 · 정밀 보정</summary>
+        <div class="stack">
+          <div class="field">
+            <span class="label">태어난 지역</span>
+            <select id="city"></select>
+            <span class="hint">한국 표준시는 동경 135° 기준이라 실제 태양의 위치와 최대 30분 넘게 차이납니다. 지역을 고르면 진태양시로 보정해요.</span>
+          </div>
+          <label class="check"><input type="checkbox" id="tsolar" checked> 진태양시 보정 사용</label>
+          <label class="check"><input type="checkbox" id="yaja" checked> 밤 11시 이후는 다음 날로 계산 (야자시)</label>
+        </div>
+      </details>
+    </div>
+
+    <div class="card stack">
+      <div class="field">
+        <span class="label">MBTI</span>
+        <div class="mbti-grid" id="mbti">
+          <div class="axis" data-axis="0">
+            <button type="button" data-v="E" aria-pressed="false"><b>E</b><span>밖에서 충전</span></button>
+            <button type="button" data-v="I" aria-pressed="false"><b>I</b><span>안에서 충전</span></button>
+          </div>
+          <div class="axis" data-axis="1">
+            <button type="button" data-v="S" aria-pressed="false"><b>S</b><span>현실·감각</span></button>
+            <button type="button" data-v="N" aria-pressed="false"><b>N</b><span>가능성·직관</span></button>
+          </div>
+          <div class="axis" data-axis="2">
+            <button type="button" data-v="T" aria-pressed="false"><b>T</b><span>논리로 판단</span></button>
+            <button type="button" data-v="F" aria-pressed="false"><b>F</b><span>마음으로 판단</span></button>
+          </div>
+          <div class="axis" data-axis="3">
+            <button type="button" data-v="J" aria-pressed="false"><b>J</b><span>계획대로</span></button>
+            <button type="button" data-v="P" aria-pressed="false"><b>P</b><span>흐름대로</span></button>
+          </div>
+        </div>
+        <div class="mbti-out" id="mbtiOut">○ ○ ○ ○</div>
+      </div>
+    </div>
+
+    <button class="cta" id="go" disabled>결과 보기</button>
+    <div id="err"></div>
+    <p class="note">입력한 정보는 어디에도 저장되거나 전송되지 않습니다. 모든 계산은 이 화면 안에서만 이뤄져요.</p>
+  </div>
+
+  <div id="result"></div>
+</div>
+<div class="toast" id="toast">링크를 복사했어요</div>
+
+<script>
+/*__ENGINE__*/
+</script>
+<script>
+/*__CONTENT__*/
+</script>
+<script>
+/*__APP__*/
+</script>
