@@ -402,6 +402,78 @@ details.adv .stack{margin-top:16px}
 }
 .toast.on{opacity:1; transform:translateX(-50%)}
 
+
+/* ===== 하위 탭 ===== */
+.subtabs{display:flex; gap:0; border:1px solid var(--frame); margin:16px 0 20px; overflow:hidden}
+.subtabs button{
+  flex:1; appearance:none; border:0; border-right:1px solid var(--frame); background:var(--surface);
+  color:var(--muted); font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:15px;
+  padding:10px 4px; cursor:pointer; letter-spacing:.08em; transition:background .14s,color .14s;
+}
+.subtabs button:last-child{border-right:0}
+.subtabs button[aria-selected="true"]{background:var(--red); color:#FFF6E8}
+.subtabs button:focus-visible{outline:2px solid var(--frame); outline-offset:-3px}
+
+/* ===== 블록 제목 ===== */
+.blk-t{
+  font-family:"Gowun Dodum",sans-serif; font-size:11px; letter-spacing:.16em; color:var(--sec,var(--red));
+  margin:26px 0 12px; padding-bottom:9px; border-bottom:1px solid var(--rule);
+}
+
+/* ===== 상대 카드 ===== */
+.mcards{display:flex; flex-direction:column; gap:1px; background:var(--rule); border:1px solid var(--frame)}
+.mcard{background:var(--surface); padding:14px 14px 13px}
+.mc-t{font-size:10.5px; letter-spacing:.12em; color:var(--muted)}
+.mc-n{font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:17px; color:var(--ink); margin-top:4px; line-height:1.4}
+.mc-k{display:flex; flex-wrap:wrap; gap:4px; margin-top:9px}
+.mc-k span{font-size:10.5px; padding:2px 8px; border:1px solid var(--rule); color:var(--muted)}
+.mcard p{
+  margin:10px 0 0; font-family:"Noto Serif KR",serif; font-weight:500;
+  font-size:13.5px; line-height:1.8; color:var(--ink-2);
+}
+
+/* ===== 체크리스트 ===== */
+.clist{border:1px solid var(--frame); background:var(--surface); margin-top:22px}
+.cl-t{
+  background:var(--frame); color:#F8F2E2; font-size:11px; letter-spacing:.14em;
+  padding:8px 12px;
+}
+.cl-i{display:flex; gap:10px; padding:11px 13px; border-bottom:1px solid var(--rule-soft)}
+.cl-i:last-child{border-bottom:0}
+.cl-i i{
+  flex:none; width:7px; height:7px; margin-top:8px; background:var(--red);
+  transform:rotate(45deg);
+}
+.cl-i span{
+  font-family:"Noto Serif KR",serif; font-weight:500; font-size:13.5px;
+  line-height:1.8; color:var(--ink-2);
+}
+
+/* ===== 결혼 적령기 타임라인 ===== */
+.tl{margin-top:22px; border:1px solid var(--frame); background:var(--surface); padding:14px 14px 12px}
+.tl-t{font-size:11px; letter-spacing:.1em; color:var(--muted); margin-bottom:16px}
+.tl-track{position:relative; height:26px; background:var(--paper-2); border:1px solid var(--rule)}
+.tl-bar{position:absolute; top:0; bottom:0; background:var(--red-soft); border-left:2px solid var(--red); border-right:2px solid var(--red)}
+.tl-lab{
+  position:absolute; top:-14px; font-size:10px; color:var(--red-deep);
+  font-variant-numeric:tabular-nums; transform:translateX(-2px);
+}
+.tl-now{position:absolute; top:-4px; bottom:-4px; width:2px; background:var(--ink); z-index:2}
+.tl-now::after{
+  content:"지금"; position:absolute; left:50%; bottom:-17px; transform:translateX(-50%);
+  font-size:9.5px; color:var(--ink); white-space:nowrap;
+}
+.tl-ax{display:flex; justify-content:space-between; margin-top:20px; font-size:10px; color:var(--muted)}
+.tl-none{
+  margin:12px 0 0; font-family:"Noto Serif KR",serif; font-weight:500;
+  font-size:13px; line-height:1.8; color:var(--ink-2);
+}
+
+/* ===== 직업 격자 ===== */
+.jobs{display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--rule); border:1px solid var(--frame)}
+.job{background:var(--surface); padding:12px 11px; text-align:center}
+.job b{display:block; font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:14.5px; color:var(--ink); line-height:1.4}
+.job span{display:block; font-size:10px; color:var(--muted); margin-top:4px}
 </style>
 
 <div class="wrap">

@@ -112,6 +112,48 @@ function run() {
 }
 
 /* ---------- 조각 렌더러 ---------- */
+/* ---------- 시각 블록 렌더러 ---------- */
+function matchCard(title, name, kw, line) {
+  return `<div class="mcard">
+    <div class="mc-t">${title}</div>
+    <div class="mc-n">${name}</div>
+    <div class="mc-k">${kw.map(k => `<span>${k}</span>`).join('')}</div>
+    <p>${line}</p>
+  </div>`;
+}
+
+function checkList(title, items) {
+  if (!items.length) return '';
+  return `<div class="clist">
+    <div class="cl-t">${title}</div>
+    ${items.map(t => `<div class="cl-i"><i></i><span>${t}</span></div>`).join('')}
+  </div>`;
+}
+
+function marryTimeline(w) {
+  const pct = (a) => ((a - w.min) / (w.max - w.min)) * 100;
+  const bars = w.spans.map(sp => {
+    const from = Math.max(sp.from, w.min), to = Math.min(sp.to, w.max);
+    return `<b class="tl-bar" style="left:${pct(from)}%;width:${pct(to) - pct(from)}%"></b>
+            <span class="tl-lab" style="left:${pct(from)}%">${sp.from}세</span>`;
+  }).join('');
+  const nowPct = w.age >= w.min && w.age <= w.max ? pct(w.age) : null;
+  return `<div class="tl">
+    <div class="tl-t">${w.grp}이 드는 구간 · 인연이 눈에 보이는 시기</div>
+    <div class="tl-track">
+      ${bars}
+      ${nowPct != null ? `<b class="tl-now" style="left:${nowPct}%"></b>` : ''}
+    </div>
+    <div class="tl-ax"><span>15세</span><span>35세</span><span>55세</span></div>
+    ${w.spans.length ? '' : '<p class="tl-none">이 구간에는 해당 시기가 없습니다. 10년 단위의 흐름보다 그해의 운이나 일상의 계기로 만나는 쪽이에요.</p>'}
+  </div>`;
+}
+
+function jobGrid(picks) {
+  return `<div class="jobs">${picks.map(j =>
+    `<div class="job"><b>${j.name}</b><span>${j.why}</span></div>`).join('')}</div>`;
+}
+
 function codeRow(label, code, diffAgainst, tone) {
   const letters = code.split('').map((c, i) =>
     `<span class="${diffAgainst && diffAgainst[i] !== c ? 'diff' : ''}">${c}</span>`).join('');
@@ -165,6 +207,29 @@ function compareChart(rep, mbtiKey) {
 }
 
 const HUE_VAR = { 목: '--el-mok', 화: '--el-hwa', 토: '--el-to', 금: '--el-geum', 수: '--el-su' };
+/* 연애와 결혼을 한 칸 안에서 탭으로 */
+function pairCard(a, b, extraA, extraB) {
+  const para = (x) => x.body.map((p, i) =>
+    `<p class="${x.soothe && i === x.body.length - 1 ? 'soothe' : ''}">${p}</p>`).join('');
+  const chips = (x) => x.chips ? `<div class="chips">${x.chips.map(k => `<span class="pill">${k}</span>`).join('')}</div>` : '';
+  return `
+    <section class="card sec" style="--sec:var(--el-hwa)">
+      <span class="tag">연애와 결혼</span>
+      <div class="subtabs" role="tablist">
+        <button type="button" role="tab" aria-selected="true" data-p="A">연애</button>
+        <button type="button" role="tab" aria-selected="false" data-p="B">결혼</button>
+      </div>
+      <div class="pane" data-p="A">
+        <h3>${a.title}</h3>
+        ${para(a)}${extraA}${chips(a)}
+      </div>
+      <div class="pane" data-p="B" hidden>
+        <h3>${b.title}</h3>
+        ${para(b)}${extraB}${chips(b)}
+      </div>
+    </section>`;
+}
+
 function sectionCard(x) {
   const last = x.body.length - 1;
   const hue = x.hue ? ` style="--sec:var(${HUE_VAR[x.hue]})"` : '';
@@ -256,13 +321,17 @@ function render(s, inp) {
   const todayJD = gregorianToJDN(NOW.getFullYear(), NOW.getMonth() + 1, NOW.getDate()) - 0.5;
   const months = monthlyFortune(s, NOW.getFullYear(), todayJD);
 
+  const picks = jobPicks(s, rep.gyeok);
+
   const aptitudeSec = `
     <section class="card sec" style="--sec:var(--el-geum)">
       <span class="tag">적성</span>
       <h3>${job.tag}</h3>
       <p>월지에서 잡히는 격국이 <b>${rep.gyeok}</b>입니다. 사주에서 사람의 틀을 가장 크게 정하는 자리이고, 어떤 판에 놓였을 때 가장 자기답게 움직이는지를 보여줍니다.</p>
       <p>${job.line}</p>
-      <p>다만 격국은 직업의 이름이 아니라 <b>일하는 방식의 결</b>입니다. 같은 회사 안에서도 이 결에 맞는 자리로 옮기면 훨씬 덜 지칩니다.</p>
+      <div class="blk-t">잘 맞는 직업</div>
+      ${jobGrid(picks)}
+      <p style="margin-top:16px">다만 격국은 직업의 이름이 아니라 <b>일하는 방식의 결</b>입니다. 위 목록은 예시일 뿐이고, 같은 회사 안에서도 이 결에 맞는 자리로 옮기면 훨씬 덜 지칩니다.</p>
     </section>`;
 
   const healthSec = `
@@ -311,6 +380,25 @@ function render(s, inp) {
   const secs = rep.sections;
   const head = secs[0], rest = secs.slice(1);
 
+  /* 연애·결혼 시각 블록 */
+  const loveSec = secs.find(x => x.id === 'love');
+  const marSec = secs.find(x => x.id === 'marriage');
+  const partner = PARTNER_TYPE[s.spouseGod];
+  const elp = EL_PARTNER[s.yongshin];
+  const cautions = loveCautions(s, rep);
+  const mw = marryWindow(s, age);
+  const loveExtra = `
+    <div class="blk-t">이런 사람과 잘 맞아요</div>
+    <div class="mcards">
+      ${matchCard('끌리는 쪽', partner.name, partner.kw, partner.line)}
+      ${matchCard('숨이 트이는 쪽', elp.name, elp.kw, elp.line)}
+      ${matchCard('띠 궁합', cp.goodAnimals.map(a => a + '띠').join(' · '), ['일지 합'], `일지 ${cp.dayJi.k}(${cp.dayJi.h})와 합을 이루는 띠입니다. 반대로 ${cp.hardAnimals.join('·')}띠와는 자극이 큰 관계예요.`)}
+    </div>
+    ${checkList('연애할 때 조심할 것', cautions)}`;
+  const marryExtra = `${marryTimeline(mw)}`;
+  const lovePair = loveSec && marSec ? pairCard(loveSec, marSec, loveExtra, marryExtra) : '';
+
+
   $('#result').innerHTML = `
     <div class="hero">
       <div class="eyebrow">${esc(rep.eyebrow)}</div>
@@ -328,7 +416,7 @@ function render(s, inp) {
     ${compareChart(rep, inp.mbti)}
     ${sectionCard(head)}
     ${wongook}
-    ${rest.map(sectionCard).join('')}
+    ${rest.map(x => x.id === 'love' ? lovePair : x.id === 'marriage' ? '' : sectionCard(x)).join('')}
     ${aptitudeSec}
     ${healthSec}
 
@@ -402,6 +490,12 @@ function render(s, inp) {
       사람은 사주로도 MBTI로도 다 설명되지 않아요. 맞는 문장만 가져가고, 나머지는 흘려보내면 됩니다.
     </p>`;
 
+  /* 연애·결혼 탭 */
+  $$('.subtabs button').forEach(b => b.addEventListener('click', () => {
+    const box = b.closest('.sec');
+    $$('.subtabs button', box).forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    $$('.pane', box).forEach(p => { p.hidden = p.dataset.p !== b.dataset.p; });
+  }));
   $('#share').addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(location.href);

@@ -425,6 +425,78 @@ details.adv .stack{margin-top:16px}
 }
 .toast.on{opacity:1; transform:translateX(-50%)}
 
+
+/* ===== 하위 탭 ===== */
+.subtabs{display:flex; gap:0; border:1px solid var(--frame); margin:16px 0 20px; overflow:hidden}
+.subtabs button{
+  flex:1; appearance:none; border:0; border-right:1px solid var(--frame); background:var(--surface);
+  color:var(--muted); font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:15px;
+  padding:10px 4px; cursor:pointer; letter-spacing:.08em; transition:background .14s,color .14s;
+}
+.subtabs button:last-child{border-right:0}
+.subtabs button[aria-selected="true"]{background:var(--red); color:#FFF6E8}
+.subtabs button:focus-visible{outline:2px solid var(--frame); outline-offset:-3px}
+
+/* ===== 블록 제목 ===== */
+.blk-t{
+  font-family:"Gowun Dodum",sans-serif; font-size:11px; letter-spacing:.16em; color:var(--sec,var(--red));
+  margin:26px 0 12px; padding-bottom:9px; border-bottom:1px solid var(--rule);
+}
+
+/* ===== 상대 카드 ===== */
+.mcards{display:flex; flex-direction:column; gap:1px; background:var(--rule); border:1px solid var(--frame)}
+.mcard{background:var(--surface); padding:14px 14px 13px}
+.mc-t{font-size:10.5px; letter-spacing:.12em; color:var(--muted)}
+.mc-n{font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:17px; color:var(--ink); margin-top:4px; line-height:1.4}
+.mc-k{display:flex; flex-wrap:wrap; gap:4px; margin-top:9px}
+.mc-k span{font-size:10.5px; padding:2px 8px; border:1px solid var(--rule); color:var(--muted)}
+.mcard p{
+  margin:10px 0 0; font-family:"Noto Serif KR",serif; font-weight:500;
+  font-size:13.5px; line-height:1.8; color:var(--ink-2);
+}
+
+/* ===== 체크리스트 ===== */
+.clist{border:1px solid var(--frame); background:var(--surface); margin-top:22px}
+.cl-t{
+  background:var(--frame); color:#F8F2E2; font-size:11px; letter-spacing:.14em;
+  padding:8px 12px;
+}
+.cl-i{display:flex; gap:10px; padding:11px 13px; border-bottom:1px solid var(--rule-soft)}
+.cl-i:last-child{border-bottom:0}
+.cl-i i{
+  flex:none; width:7px; height:7px; margin-top:8px; background:var(--red);
+  transform:rotate(45deg);
+}
+.cl-i span{
+  font-family:"Noto Serif KR",serif; font-weight:500; font-size:13.5px;
+  line-height:1.8; color:var(--ink-2);
+}
+
+/* ===== 결혼 적령기 타임라인 ===== */
+.tl{margin-top:22px; border:1px solid var(--frame); background:var(--surface); padding:14px 14px 12px}
+.tl-t{font-size:11px; letter-spacing:.1em; color:var(--muted); margin-bottom:16px}
+.tl-track{position:relative; height:26px; background:var(--paper-2); border:1px solid var(--rule)}
+.tl-bar{position:absolute; top:0; bottom:0; background:var(--red-soft); border-left:2px solid var(--red); border-right:2px solid var(--red)}
+.tl-lab{
+  position:absolute; top:-14px; font-size:10px; color:var(--red-deep);
+  font-variant-numeric:tabular-nums; transform:translateX(-2px);
+}
+.tl-now{position:absolute; top:-4px; bottom:-4px; width:2px; background:var(--ink); z-index:2}
+.tl-now::after{
+  content:"지금"; position:absolute; left:50%; bottom:-17px; transform:translateX(-50%);
+  font-size:9.5px; color:var(--ink); white-space:nowrap;
+}
+.tl-ax{display:flex; justify-content:space-between; margin-top:20px; font-size:10px; color:var(--muted)}
+.tl-none{
+  margin:12px 0 0; font-family:"Noto Serif KR",serif; font-weight:500;
+  font-size:13px; line-height:1.8; color:var(--ink-2);
+}
+
+/* ===== 직업 격자 ===== */
+.jobs{display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--rule); border:1px solid var(--frame)}
+.job{background:var(--surface); padding:12px 11px; text-align:center}
+.job b{display:block; font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:14.5px; color:var(--ink); line-height:1.4}
+.job span{display:block; font-size:10px; color:var(--muted); margin-top:4px}
 </style>
 
 <div class="wrap">
@@ -1759,7 +1831,7 @@ function generateReport(s, mbtiKey) {
   const loveShift = changed.map(a => LOVE_SHIFT[a.key]).filter(Boolean);
   const loveSal = salFor(s, '연애');
   sec.push({
-    id: 'love', hue: '화', tag: '연애', title: '어떤 사람에게 마음이 기우는가',
+    id: 'love', hue: '화', tag: '연애', title: '어떤 사람에게 마음이 기우는가', pair: 'marriage',
     body: [
       `일지(日支)는 배우자 자리로 봅니다. 당신의 일지에는 ${dayJi.k}(${dayJi.h})가 앉아 있고, 성격상 ${spouseGod}에 해당해요. ${spouseLine}`,
       `${ilgan.love} 이게 원국이 원하는 사랑의 모양입니다.`,
@@ -1793,7 +1865,7 @@ function generateReport(s, mbtiKey) {
     .filter(a => a >= 15 && a <= 55);
 
   sec.push({
-    id: 'marriage', hue: '토', tag: '결혼', title: '배우자 자리에 앉은 글자',
+    id: 'marriage', hue: '토', tag: '결혼', title: '배우자 자리에 앉은 글자', sub: true,
     body: [
       `연애와 결혼은 사주에서 보는 자리가 다릅니다. 결혼은 일지, 곧 ${dayJi.k}(${dayJi.h}) 한 글자에 거의 다 걸려 있어요. 이 자리의 십이운성은 <b>${spouseStage}</b>입니다. ${STAGE_DESC[spouseStage].line}`,
       `${isMale ? '남자에게는 재성이 아내 자리입니다.' : '여자에게는 관성이 남편 자리입니다.'} 당신의 원국에는 ${spouseN === 0 ? spouseGrp + '이 하나도 없습니다' : spouseGrp + '이 ' + spouseN + '개 있어요'}. ${spouseN === 0
@@ -2136,6 +2208,102 @@ function luckyKit(s) {
   ];
 }
 
+/* ============================================================
+   시각 블록용 데이터: 연애 상대 · 주의점 · 결혼 적령기 · 직업
+   ============================================================ */
+
+/* 일지 십신이 끌리는 상대 유형 */
+const PARTNER_TYPE = {
+  비견: { name: '대등한 동료형', kw: ['같은 눈높이', '독립적', '각자의 영역'], line: '나란히 걷는 사람. 챙겨주기보다 각자 잘 서 있는 관계를 원합니다.' },
+  겁재: { name: '자극을 주는 사람', kw: ['승부욕', '솔직함', '팽팽함'], line: '지루할 틈을 안 주는 사람. 대신 부딪히는 날도 그만큼 많아요.' },
+  식신: { name: '편안하게 해주는 사람', kw: ['다정함', '먹여줌', '여유'], line: '같이 있으면 밥이 잘 넘어가는 사람. 표정이 눈에 띄게 좋아집니다.' },
+  상관: { name: '재능을 알아봐주는 사람', kw: ['감탄', '자유', '대화'], line: '내 얘기를 재미있어 하는 사람. 잔소리하는 순간 마음이 식어요.' },
+  편재: { name: '활동적이고 스케일 큰 사람', kw: ['추진력', '넓은 반경', '이벤트'], line: '같이 있으면 세상이 넓어지는 사람. 잔잔한 일상은 좀 심심합니다.' },
+  정재: { name: '성실하고 계획적인 사람', kw: ['안정', '약속', '알뜰함'], line: '오늘도 내일도 같은 자리에 있는 사람. 설렘보다 신뢰가 먼저예요.' },
+  편관: { name: '카리스마 있는 사람', kw: ['긴장감', '주도', '강단'], line: '나를 끌어당기고 밀어붙이는 사람. 부딪히면서 크는 연애입니다.' },
+  정관: { name: '반듯하고 책임감 있는 사람', kw: ['예의', '책임', '장기전'], line: '처음부터 끝을 생각하는 사람. 어른들도 좋아하는 상대예요.' },
+  편인: { name: '속을 알기 어려운 사람', kw: ['독특함', '깊이', '거리감'], line: '말이 통하는 순간 확 빠져드는 사람. 정신적으로 안 통하면 시작이 안 됩니다.' },
+  정인: { name: '보살펴주는 어른스러운 사람', kw: ['포용', '지혜', '안정감'], line: '내 얘기를 끝까지 들어주는 사람. 그 앞에서 긴장이 풀립니다.' },
+};
+
+/* 용신 오행이 필요로 하는 상대의 결 */
+const EL_PARTNER = {
+  목: { name: '자라게 해주는 사람', kw: ['성장', '계획', '추진'], line: '나를 앞으로 밀어주는 사람 옆에서 숨이 트입니다.' },
+  화: { name: '환하게 만들어주는 사람', kw: ['표현', '온기', '활기'], line: '감정을 숨기지 않는 사람 옆에서 마음이 데워집니다.' },
+  토: { name: '중심을 잡아주는 사람', kw: ['안정', '신뢰', '버팀'], line: '흔들릴 때 그대로 서 있어주는 사람이 필요합니다.' },
+  금: { name: '정리해주는 사람', kw: ['결단', '기준', '깔끔함'], line: '늘어진 것을 끊어주는 사람 옆에서 정신이 맑아집니다.' },
+  수: { name: '흐르게 해주는 사람', kw: ['유연', '지혜', '여백'], line: '막힌 데를 풀어주는 사람 옆에서 편해집니다.' },
+};
+
+/* 연애할 때 조심할 것 */
+function loveCautions(s, rep) {
+  const gg = s.godGroups, out = [];
+  if (gg.재성 === 0) out.push('좋아하는 마음을 아끼다 상대가 눈치채지 못하고 지나갑니다. 표현은 생각보다 두 배쯤 해야 전달돼요.');
+  if (gg.재성 >= 3) out.push('동시에 여러 마음이 다 진심이라 결정을 자꾸 미룹니다. 재는 게 아니라 정말 고르기 어려운 겁니다.');
+  if (gg.관성 >= 3) out.push('"잘해야 한다"는 압박이 연애를 숙제로 만듭니다. 상대는 완벽한 연인보다 편한 연인을 원해요.');
+  if (gg.관성 === 0) out.push('구속을 못 견뎌 먼저 거리를 둡니다. 상대는 그걸 마음이 식은 걸로 읽어요.');
+  if (gg.비겁 >= 3) out.push('지지 않으려다 사소한 걸로 다툽니다. 이기는 것보다 넘어가는 게 이득인 순간이 있어요.');
+  if (gg.식상 === 0) out.push('속에 있는 말이 밖으로 안 나옵니다. 침묵이 길어지면 상대는 최악을 상상합니다.');
+  if (s.shinsal.includes('도화살') || s.shinsal.includes('홍염살'))
+    out.push('본의 아니게 눈에 띕니다. 매력은 자산이지만 오해도 같이 따라오니, 선은 스스로 그어두는 게 편해요.');
+  if (s.spouseChung) out.push('관계가 잔잔해지면 오히려 답답해집니다. 변화를 관계 밖에서 만드는 연습이 필요해요.');
+  if (s.strength === '신약') out.push('상대에게 맞추다 내가 뭘 원했는지 잊어버립니다. 맞춰주는 것과 사라지는 건 다릅니다.');
+  if (s.strength === '신강') out.push('혼자 결정하고 통보하는 습관이 있습니다. 과정에 상대를 넣어주세요.');
+  if (gg.인성 >= 3) out.push('생각이 길어 타이밍을 놓칩니다. 확신이 설 때쯤이면 상대는 이미 다른 결론을 냈을 수 있어요.');
+  if (gg.식상 >= 3) out.push('하고 싶은 말을 참지 못해 상처를 줍니다. 맞는 말이어도 지금 할 말인지 한 번만 더 보세요.');
+  if (gg.비겁 <= 1) out.push('내 편이 되어달라는 마음이 커서 기대가 쌓입니다. 기대는 말로 꺼내야 요구가 되고, 안 꺼내면 서운함이 됩니다.');
+  if (s.shinsal.includes('원진살')) out.push('미워하면서도 못 놓는 관계가 생기기 쉽습니다. 익숙함과 애정을 구분하는 게 숙제예요.');
+  rep.changed.slice(0, 1).forEach(a => { if (LOVE_SHIFT[a.key]) out.push(LOVE_SHIFT[a.key]); });
+  if (!out.length) out.push('원국에 크게 걸리는 지점이 없습니다. 다만 어느 사주에나 공통인 게 하나 있어요. 말하지 않은 걸 상대가 알아서 해주길 기대하는 순간부터 어긋나기 시작합니다.');
+  return out.slice(0, 4);
+}
+
+/* 오행별 직업군 */
+const EL_JOB = {
+  목: ['교육', '출판·편집', '기획', '인사·조직', '환경·조경'],
+  화: ['광고·마케팅', '디자인', '방송·영상', '요리', '뷰티'],
+  토: ['부동산', '건축·시공', '중개·컨설팅', '식품', '공공행정'],
+  금: ['금융', '의료', '법률', '제조·기계', '보안·품질'],
+  수: ['유통·무역', '연구·분석', '상담·심리', '미디어', 'IT·데이터'],
+};
+
+/* 격국별 대표 직군 */
+const GYEOK_CORE = {
+  비견: ['전문직 개업', '프리랜서', '1인 브랜드'],
+  겁재: ['영업', '트레이딩', '스포츠·승부업'],
+  식신: ['요리·식음료', '교육', '돌봄·복지'],
+  상관: ['기획·창작', '방송·강연', '비평·컨설팅'],
+  편재: ['사업', '유통·무역', '투자'],
+  정재: ['회계·재무', '금융', '품질·관리'],
+  편관: ['의료', '수사·안전', '감사·리스크'],
+  정관: ['공직', '대기업 관리', '법률·행정'],
+  편인: ['연구', '상담·심리', '예술·종교'],
+  정인: ['교육·학문', '출판', '인사·공공'],
+};
+
+/* 잘 맞는 직업 6개 */
+function jobPicks(s, gyeok) {
+  const core = GYEOK_CORE[gyeok] || [];
+  const yong = EL_JOB[s.yongshin] || [];
+  const strong = EL_JOB[s.strongest] || [];
+  const out = [];
+  const push = (v, why) => { if (v && !out.some(o => o.name === v)) out.push({ name: v, why }); };
+  core.forEach(v => push(v, gyeok + '격'));
+  yong.slice(0, 3).forEach(v => push(v, '용신 ' + s.yongshin));
+  strong.slice(0, 2).forEach(v => push(v, '강한 ' + s.strongest));
+  return out.slice(0, 6);
+}
+
+/* 결혼 적령기 구간 (15~55세) */
+function marryWindow(s, age) {
+  const grp = s.gender === 'M' ? '재성' : '관성';
+  const spans = s.daeun
+    .filter(d => GOD_GROUP_OF[ENGINE.tenGod(s.dayGan, d.gan)] === grp)
+    .map(d => ({ from: d.age, to: d.age + 9 }))
+    .filter(w => w.to >= 15 && w.from <= 55);
+  return { grp, spans, age, min: 15, max: 55 };
+}
+
 </script>
 <script>
 /* ============================================================
@@ -2252,6 +2420,48 @@ function run() {
 }
 
 /* ---------- 조각 렌더러 ---------- */
+/* ---------- 시각 블록 렌더러 ---------- */
+function matchCard(title, name, kw, line) {
+  return `<div class="mcard">
+    <div class="mc-t">${title}</div>
+    <div class="mc-n">${name}</div>
+    <div class="mc-k">${kw.map(k => `<span>${k}</span>`).join('')}</div>
+    <p>${line}</p>
+  </div>`;
+}
+
+function checkList(title, items) {
+  if (!items.length) return '';
+  return `<div class="clist">
+    <div class="cl-t">${title}</div>
+    ${items.map(t => `<div class="cl-i"><i></i><span>${t}</span></div>`).join('')}
+  </div>`;
+}
+
+function marryTimeline(w) {
+  const pct = (a) => ((a - w.min) / (w.max - w.min)) * 100;
+  const bars = w.spans.map(sp => {
+    const from = Math.max(sp.from, w.min), to = Math.min(sp.to, w.max);
+    return `<b class="tl-bar" style="left:${pct(from)}%;width:${pct(to) - pct(from)}%"></b>
+            <span class="tl-lab" style="left:${pct(from)}%">${sp.from}세</span>`;
+  }).join('');
+  const nowPct = w.age >= w.min && w.age <= w.max ? pct(w.age) : null;
+  return `<div class="tl">
+    <div class="tl-t">${w.grp}이 드는 구간 · 인연이 눈에 보이는 시기</div>
+    <div class="tl-track">
+      ${bars}
+      ${nowPct != null ? `<b class="tl-now" style="left:${nowPct}%"></b>` : ''}
+    </div>
+    <div class="tl-ax"><span>15세</span><span>35세</span><span>55세</span></div>
+    ${w.spans.length ? '' : '<p class="tl-none">이 구간에는 해당 시기가 없습니다. 10년 단위의 흐름보다 그해의 운이나 일상의 계기로 만나는 쪽이에요.</p>'}
+  </div>`;
+}
+
+function jobGrid(picks) {
+  return `<div class="jobs">${picks.map(j =>
+    `<div class="job"><b>${j.name}</b><span>${j.why}</span></div>`).join('')}</div>`;
+}
+
 function codeRow(label, code, diffAgainst, tone) {
   const letters = code.split('').map((c, i) =>
     `<span class="${diffAgainst && diffAgainst[i] !== c ? 'diff' : ''}">${c}</span>`).join('');
@@ -2305,6 +2515,29 @@ function compareChart(rep, mbtiKey) {
 }
 
 const HUE_VAR = { 목: '--el-mok', 화: '--el-hwa', 토: '--el-to', 금: '--el-geum', 수: '--el-su' };
+/* 연애와 결혼을 한 칸 안에서 탭으로 */
+function pairCard(a, b, extraA, extraB) {
+  const para = (x) => x.body.map((p, i) =>
+    `<p class="${x.soothe && i === x.body.length - 1 ? 'soothe' : ''}">${p}</p>`).join('');
+  const chips = (x) => x.chips ? `<div class="chips">${x.chips.map(k => `<span class="pill">${k}</span>`).join('')}</div>` : '';
+  return `
+    <section class="card sec" style="--sec:var(--el-hwa)">
+      <span class="tag">연애와 결혼</span>
+      <div class="subtabs" role="tablist">
+        <button type="button" role="tab" aria-selected="true" data-p="A">연애</button>
+        <button type="button" role="tab" aria-selected="false" data-p="B">결혼</button>
+      </div>
+      <div class="pane" data-p="A">
+        <h3>${a.title}</h3>
+        ${para(a)}${extraA}${chips(a)}
+      </div>
+      <div class="pane" data-p="B" hidden>
+        <h3>${b.title}</h3>
+        ${para(b)}${extraB}${chips(b)}
+      </div>
+    </section>`;
+}
+
 function sectionCard(x) {
   const last = x.body.length - 1;
   const hue = x.hue ? ` style="--sec:var(${HUE_VAR[x.hue]})"` : '';
@@ -2396,13 +2629,17 @@ function render(s, inp) {
   const todayJD = gregorianToJDN(NOW.getFullYear(), NOW.getMonth() + 1, NOW.getDate()) - 0.5;
   const months = monthlyFortune(s, NOW.getFullYear(), todayJD);
 
+  const picks = jobPicks(s, rep.gyeok);
+
   const aptitudeSec = `
     <section class="card sec" style="--sec:var(--el-geum)">
       <span class="tag">적성</span>
       <h3>${job.tag}</h3>
       <p>월지에서 잡히는 격국이 <b>${rep.gyeok}</b>입니다. 사주에서 사람의 틀을 가장 크게 정하는 자리이고, 어떤 판에 놓였을 때 가장 자기답게 움직이는지를 보여줍니다.</p>
       <p>${job.line}</p>
-      <p>다만 격국은 직업의 이름이 아니라 <b>일하는 방식의 결</b>입니다. 같은 회사 안에서도 이 결에 맞는 자리로 옮기면 훨씬 덜 지칩니다.</p>
+      <div class="blk-t">잘 맞는 직업</div>
+      ${jobGrid(picks)}
+      <p style="margin-top:16px">다만 격국은 직업의 이름이 아니라 <b>일하는 방식의 결</b>입니다. 위 목록은 예시일 뿐이고, 같은 회사 안에서도 이 결에 맞는 자리로 옮기면 훨씬 덜 지칩니다.</p>
     </section>`;
 
   const healthSec = `
@@ -2451,6 +2688,25 @@ function render(s, inp) {
   const secs = rep.sections;
   const head = secs[0], rest = secs.slice(1);
 
+  /* 연애·결혼 시각 블록 */
+  const loveSec = secs.find(x => x.id === 'love');
+  const marSec = secs.find(x => x.id === 'marriage');
+  const partner = PARTNER_TYPE[s.spouseGod];
+  const elp = EL_PARTNER[s.yongshin];
+  const cautions = loveCautions(s, rep);
+  const mw = marryWindow(s, age);
+  const loveExtra = `
+    <div class="blk-t">이런 사람과 잘 맞아요</div>
+    <div class="mcards">
+      ${matchCard('끌리는 쪽', partner.name, partner.kw, partner.line)}
+      ${matchCard('숨이 트이는 쪽', elp.name, elp.kw, elp.line)}
+      ${matchCard('띠 궁합', cp.goodAnimals.map(a => a + '띠').join(' · '), ['일지 합'], `일지 ${cp.dayJi.k}(${cp.dayJi.h})와 합을 이루는 띠입니다. 반대로 ${cp.hardAnimals.join('·')}띠와는 자극이 큰 관계예요.`)}
+    </div>
+    ${checkList('연애할 때 조심할 것', cautions)}`;
+  const marryExtra = `${marryTimeline(mw)}`;
+  const lovePair = loveSec && marSec ? pairCard(loveSec, marSec, loveExtra, marryExtra) : '';
+
+
   $('#result').innerHTML = `
     <div class="hero">
       <div class="eyebrow">${esc(rep.eyebrow)}</div>
@@ -2468,7 +2724,7 @@ function render(s, inp) {
     ${compareChart(rep, inp.mbti)}
     ${sectionCard(head)}
     ${wongook}
-    ${rest.map(sectionCard).join('')}
+    ${rest.map(x => x.id === 'love' ? lovePair : x.id === 'marriage' ? '' : sectionCard(x)).join('')}
     ${aptitudeSec}
     ${healthSec}
 
@@ -2542,6 +2798,12 @@ function render(s, inp) {
       사람은 사주로도 MBTI로도 다 설명되지 않아요. 맞는 문장만 가져가고, 나머지는 흘려보내면 됩니다.
     </p>`;
 
+  /* 연애·결혼 탭 */
+  $$('.subtabs button').forEach(b => b.addEventListener('click', () => {
+    const box = b.closest('.sec');
+    $$('.subtabs button', box).forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    $$('.pane', box).forEach(p => { p.hidden = p.dataset.p !== b.dataset.p; });
+  }));
   $('#share').addEventListener('click', async () => {
     try {
       await navigator.clipboard.writeText(location.href);
