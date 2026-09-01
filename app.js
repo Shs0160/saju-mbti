@@ -385,9 +385,10 @@ function render(s, inp) {
     </section>
 
     ${s.shinsal.length ? `<section class="card sec" style="--sec:var(--el-to)">
-      <span class="tag">신살</span>
-      <h3>원국에 박힌 특수 기운</h3>
-      ${s.shinsal.map(k => `<p><b>${k}</b>. ${SHINSAL_DESC[k]}</p>`).join('')}
+      <span class="tag">신살 목록</span>
+      <h3>원국에 박힌 기운들</h3>
+      <p>아래 기운들은 앞의 각 항목에서 해당하는 자리에 이미 설명해 두었습니다. 여기서는 무엇이 걸려 있는지만 모아 봅니다.</p>
+      <div class="chips">${s.shinsal.map(k => `<span class="pill">${k}</span>`).join('')}</div>
     </section>` : ''}
 
     <div class="eomi"><i></i></div>

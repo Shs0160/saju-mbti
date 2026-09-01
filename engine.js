@@ -570,12 +570,49 @@ function analyze(pillars, dGan, unknownTime) {
   const MUNCHANG = { 0: 5, 1: 6, 2: 8, 3: 9, 4: 8, 5: 9, 6: 11, 7: 0, 8: 2, 9: 3 };
   if (has(MUNCHANG[dGan])) shinsal.push('문창귀인');
 
+  /* ---- 영역별 신살 ----
+     홍염: 일간 기준 은근한 매력
+     양인: 양간의 극단적 추진력 (건록 다음 자리)
+     금여: 건록에서 두 칸 앞. 배우자 덕
+     암록: 건록의 육합. 드러나지 않는 조력
+     고란: 특정 일주. 홀로 서는 기운
+     괴강: 특정 일주. 극단적 강함
+     원진: 지지 두 글자가 짝을 이루면 애증 */
+  const HONGYEOM = { 0: 6, 1: 6, 2: 2, 3: 7, 4: 4, 5: 4, 6: 10, 7: 9, 8: 0, 9: 8 };
+  if (has(HONGYEOM[dGan])) shinsal.push('홍염살');
+
+  const YANGIN = { 0: 3, 2: 6, 4: 6, 6: 9, 8: 0 };
+  if (YANGIN[dGan] !== undefined && has(YANGIN[dGan])) shinsal.push('양인살');
+
+  const GEUMYEO = { 0: 4, 1: 5, 2: 7, 3: 8, 4: 7, 5: 8, 6: 10, 7: 11, 8: 1, 9: 2 };
+  if (has(GEUMYEO[dGan])) shinsal.push('금여');
+
+  const AMROK = { 0: 11, 1: 10, 2: 8, 3: 7, 4: 8, 5: 7, 6: 5, 7: 4, 8: 2, 9: 1 };
+  if (has(AMROK[dGan])) shinsal.push('암록');
+
+  const dJi = pillars.day.ji;
+  const GORAN = [[0, 2], [1, 5], [3, 5], [4, 8], [7, 11], [4, 6], [8, 0]];
+  if (GORAN.some(([g, j]) => g === dGan && j === dJi)) shinsal.push('고란살');
+
+  const GWAEGANG = [[6, 4], [6, 10], [8, 4], [8, 10], [4, 10]];
+  if (GWAEGANG.some(([g, j]) => g === dGan && j === dJi)) shinsal.push('괴강살');
+
+  const WONJIN = [[0, 7], [1, 6], [2, 9], [3, 8], [4, 11], [5, 10]];
+  if (WONJIN.some(([a, b]) => jis.includes(a) && jis.includes(b))) shinsal.push('원진살');
+
+  /* 일지(배우자궁)의 충·합 */
+  const CHUNG = { 0: 6, 6: 0, 1: 7, 7: 1, 2: 8, 8: 2, 3: 9, 9: 3, 4: 10, 10: 4, 5: 11, 11: 5 };
+  const YUKHAP = { 0: 1, 1: 0, 2: 11, 11: 2, 3: 10, 10: 3, 4: 9, 9: 4, 5: 8, 8: 5, 6: 7, 7: 6 };
+  const others = jis.filter((_, i) => i !== 2);
+  const spouseChung = others.includes(CHUNG[dJi]);
+  const spouseHap = others.includes(YUKHAP[dJi]);
+
   // 일지(배우자궁) 십신
   const spouseGod = tenGod(dGan, GAN_IDX[JI[pillars.day.ji].hidden.slice(-1)[0][0]]);
 
   return {
     oheng, gods, godGroups, strength, strengthScore: Math.round(score * 10) / 10,
-    yongshin, strongest, weakest, missing, shinsal, spouseGod,
+    yongshin, strongest, weakest, missing, shinsal, spouseGod, spouseChung, spouseHap,
     dominantGod: Object.entries(godGroups).sort((a, b) => b[1] - a[1])[0][0],
   };
 }
