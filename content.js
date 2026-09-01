@@ -647,6 +647,146 @@ function generateReport(s, mbtiKey) {
   return { ...R, sections: sec, ilgan, mb, dom };
 }
 
+/* ============================================================
+   십이운성 · 월운 · 대운 서사 · 건강 · 적성
+   ============================================================ */
+
+/* 십이운성 12단계 */
+const STAGE_DESC = {
+  장생: { short: '새로 태어나는 자리', line: '순하고 배우려는 기운입니다. 도와주는 사람이 잘 붙어요.' },
+  목욕: { short: '씻기고 다듬어지는 자리', line: '멋과 끌림이 생기는 대신 마음이 자주 흔들립니다.' },
+  관대: { short: '옷을 갖춰 입는 자리', line: '세상에 나설 패기가 섭니다. 자신감이 실력보다 앞설 때가 있어요.' },
+  건록: { short: '제 힘으로 서는 자리', line: '기대지 않고 자기 몫을 해냅니다. 가장 단단한 구간이에요.' },
+  제왕: { short: '기운이 가장 센 자리', line: '밀어붙이는 힘이 최고조입니다. 그만큼 부러지기도 쉬워요.' },
+  쇠: { short: '정점을 막 지난 자리', line: '기세는 꺾였지만 노련해집니다. 무리하지 않는 법을 압니다.' },
+  병: { short: '힘이 빠지는 자리', line: '예민해지는 대신 남의 마음을 잘 읽습니다.' },
+  사: { short: '멈춰 서는 자리', line: '몸보다 생각이 앞서는 구간입니다. 공부와 사색에 어울려요.' },
+  묘: { short: '갈무리해 넣는 자리', line: '안으로 쌓아둡니다. 아끼는 게 인색함으로 보일 때가 있어요.' },
+  절: { short: '끊어지는 자리', line: '한번 비워야 다시 시작됩니다. 변화의 진폭이 큽니다.' },
+  태: { short: '잉태되는 자리', line: '가능성만 있고 아직 형체가 없습니다. 기대와 불안이 같이 옵니다.' },
+  양: { short: '길러지는 자리', line: '보호받으며 자랍니다. 편안한 대신 홀로서기가 늦어요.' },
+};
+const PILLAR_LIFE = {
+  year: ['년주', '태어나서 스무 살까지'],
+  month: ['월주', '스물부터 마흔 언저리'],
+  day: ['일주', '마흔부터 예순 언저리'],
+  hour: ['시주', '예순 이후'],
+};
+
+/* 월운 한 줄 (십신별) */
+const MONTH_SHORT = {
+  비견: '내 힘으로 밀어붙이기 좋은 달. 동업 얘기가 들어옵니다.',
+  겁재: '지출이 늘어나는 달. 돈 얘기는 문서로 남기세요.',
+  식신: '표현과 재능이 열리는 달. 몸도 마음도 편해집니다.',
+  상관: '하고 싶은 말이 많아지는 달. 윗사람과 부딪히기 쉬워요.',
+  편재: '움직이는 돈이 커지는 달. 기회도 새는 곳도 많습니다.',
+  정재: '차곡차곡 쌓이는 달. 안정적인 수입에 집중하기 좋아요.',
+  편관: '압박이 들어오는 달. 건강 관리에 신경 쓰세요.',
+  정관: '자리와 명분이 생기는 달. 공식적인 일에 어울립니다.',
+  편인: '생각이 깊어지는 달. 공부와 재정비에 좋습니다.',
+  정인: '도와주는 사람이 붙는 달. 배우고 회복하기 좋아요.',
+};
+
+/* 대운 서사 (십신 그룹별) */
+const DAEUN_DESC = {
+  비겁: '자기 힘으로 서는 10년입니다. 독립이나 창업, 이직처럼 스스로 결정하는 일이 늘어납니다. 사람과 부딪히는 일도 같이 늘어요.',
+  식상: '표현하고 만들어내는 10년입니다. 재능이 밖으로 나오고 이름이 알려집니다. 대신 조직의 틀은 답답하게 느껴집니다.',
+  재성: '현실과 돈이 중심이 되는 10년입니다. 벌이가 커지고 활동 반경이 넓어집니다. 관리가 안 되면 그만큼 새어나가요.',
+  관성: '책임과 자리가 무거워지는 10년입니다. 승진, 결혼, 계약처럼 공식적인 일이 몰립니다. 몸이 먼저 신호를 보냅니다.',
+  인성: '배우고 채우는 10년입니다. 공부, 자격, 재정비에 좋습니다. 실행이 늦어지는 게 유일한 아쉬움이에요.',
+};
+
+/* 오행 편중과 몸 */
+const HEALTH = {
+  목: { organ: '간·담, 눈, 근육과 힘줄', over: '화를 삭이다 간에 열이 몰립니다. 눈의 피로와 어깨 결림이 잦아요.', under: '결단이 늦고 쉽게 지칩니다. 근육이 잘 뭉치고 회복이 느려요.' },
+  화: { organ: '심장과 혈관, 소장, 혀', over: '들뜨고 잠이 얕아집니다. 가슴 두근거림과 상열감이 옵니다.', under: '손발이 차고 의욕이 잘 안 붙습니다. 저혈압 경향이 있어요.' },
+  토: { organ: '위장과 비장, 입', over: '생각이 많아 소화가 안 됩니다. 더부룩함과 체중 변화가 잦아요.', under: '중심이 약해 자주 배탈이 납니다. 식사가 불규칙해지기 쉬워요.' },
+  금: { organ: '폐와 대장, 피부, 코', over: '건조하고 예민해집니다. 비염과 피부 트러블이 반복돼요.', under: '호흡이 얕고 면역이 약합니다. 환절기마다 고생합니다.' },
+  수: { organ: '신장과 방광, 뼈, 귀', over: '몸이 잘 붓고 아래가 찹니다. 생각이 가라앉아 우울감이 옵니다.', under: '기력이 빨리 바닥납니다. 허리와 무릎, 치아가 약해요.' },
+};
+
+/* 격국별 적성 */
+const GYEOK_JOB = {
+  비견: { tag: '내 이름으로 서는 일', line: '누구 밑에 오래 있기보다 자기 간판을 다는 쪽이 맞습니다. 전문직, 1인 사업, 프리랜서처럼 실력이 곧 신용이 되는 자리예요.' },
+  겁재: { tag: '경쟁이 있는 판', line: '겨루는 자리에서 힘이 납니다. 영업, 스포츠, 트레이딩처럼 결과가 숫자로 나오는 일이 어울려요.' },
+  식신: { tag: '만들고 먹이는 일', line: '손끝에서 결과물이 나오는 일이 맞습니다. 요리, 제작, 교육, 돌봄처럼 남을 편하게 만드는 분야예요.' },
+  상관: { tag: '말과 표현으로 파는 일', line: '기존 방식을 뒤집는 데 재능이 있습니다. 기획, 창작, 방송, 비평처럼 자기 목소리가 상품이 되는 일이에요.' },
+  편재: { tag: '넓게 벌리는 일', line: '판을 크게 보고 사람과 돈을 굴립니다. 사업, 유통, 투자, 해외 관련 일이 어울려요.' },
+  정재: { tag: '정확하게 관리하는 일', line: '숫자와 절차가 어긋나지 않게 지키는 데 강합니다. 회계, 금융, 재무, 품질 관리 쪽이에요.' },
+  편관: { tag: '위기를 다루는 일', line: '압박이 있는 자리에서 오히려 정신이 맑아집니다. 수사, 의료, 안전, 감사처럼 책임이 무거운 분야예요.' },
+  정관: { tag: '체계 안에서 오르는 일', line: '조직의 규칙 안에서 착실히 올라가는 구조가 맞습니다. 공직, 대기업, 법률, 행정 쪽이에요.' },
+  편인: { tag: '비주류를 파는 일', line: '남들이 안 보는 각도를 봅니다. 연구, 상담, 종교, 예술, 데이터 분석처럼 깊게 파고드는 일이에요.' },
+  정인: { tag: '가르치고 지키는 일', line: '배운 것을 정리해 전달하는 데 강합니다. 교육, 학문, 출판, 인사, 공공 서비스 쪽이에요.' },
+};
+
+/* 네 기둥의 십이운성 */
+function lifeStages(s) {
+  const J = ENGINE.JI, G = ENGINE.GAN;
+  const out = [];
+  for (const k of ['year', 'month', 'day', 'hour']) {
+    const p = s.pillars[k];
+    if (!p) continue;
+    const st = ENGINE.twelveStage(s.dayGan, p.ji);
+    out.push({ key: k, label: PILLAR_LIFE[k][0], span: PILLAR_LIFE[k][1], ji: J[p.ji], stage: st, desc: STAGE_DESC[st] });
+  }
+  return out;
+}
+
+/* 올해 12개월 흐름 */
+function monthlyFortune(s, year, today) {
+  const G = ENGINE.GAN, J = ENGINE.JI;
+  const mp = ENGINE.monthPillars(year);
+  return mp.map((m, i) => {
+    const god = ENGINE.tenGod(s.dayGan, m.gan);
+    const next = mp[i + 1];
+    const isNow = today != null && today >= m.jd && (!next || today < next.jd);
+    return {
+      label: m.month + '월', from: m.month + '.' + m.day, term: m.term,
+      gan: m.gan, ji: m.ji, gz: G[m.gan].h + J[m.ji].h, gzk: G[m.gan].k + J[m.ji].k,
+      god, line: MONTH_SHORT[god], isNow,
+      good: G[m.gan].e === s.yongshin || J[m.ji].e === s.yongshin,
+    };
+  });
+}
+
+/* 지금 대운과 다음 대운 */
+function daeunStory(s, age) {
+  const G = ENGINE.GAN, J = ENGINE.JI;
+  const idx = s.daeun.findIndex(d => age >= d.age && age < d.age + 10);
+  const pick = (d) => {
+    if (!d) return null;
+    const god = ENGINE.tenGod(s.dayGan, d.gan);
+    const grp = GOD_GROUP_OF[god];
+    return {
+      age: d.age, gz: G[d.gan].h + J[d.ji].h, gzk: G[d.gan].k + J[d.ji].k, god, grp,
+      stage: ENGINE.twelveStage(s.dayGan, d.ji),
+      line: DAEUN_DESC[grp],
+      tone: G[d.gan].e === s.yongshin || J[d.ji].e === s.yongshin ? '순풍'
+        : G[d.gan].e === s.strongest && J[d.ji].e === s.strongest ? '과열' : '보통',
+    };
+  };
+  const now = pick(s.daeun[idx]), next = pick(s.daeun[idx + 1]);
+  /* 두 대운이 같은 결이면 같은 문장을 되풀이하지 않는다 */
+  if (now && next && next.grp === now.grp) {
+    next.line = next.god === now.god
+      ? '같은 결이 한 번 더 이어집니다. 지금 벌여둔 것이 다음 10년에 결과로 나오는 구조예요.'
+      : `결은 이어지되 성격이 조금 바뀝니다. ${now.god}에서 ${next.god}으로 넘어가면서, 같은 방향을 조금 더 ${next.god === '비견' || next.god === '정재' || next.god === '정관' || next.god === '정인' || next.god === '식신' ? '차분하게' : '거칠게'} 밀게 됩니다.`;
+  }
+  return { now, next, prev: pick(s.daeun[idx - 1]) };
+}
+const GOD_GROUP_OF = {
+  비견: '비겁', 겁재: '비겁', 식신: '식상', 상관: '식상',
+  편재: '재성', 정재: '재성', 편관: '관성', 정관: '관성',
+  편인: '인성', 정인: '인성',
+};
+
+/* 건강 */
+function healthReport(s) {
+  const vals = Object.entries(s.oheng).sort((a, b) => b[1] - a[1]);
+  const top = vals[0][0], low = vals[vals.length - 1][0];
+  return { top, low, topH: HEALTH[top], lowH: HEALTH[low], yong: HEALTH[s.yongshin] };
+}
+
 /* ---------- 올해의 운 ---------- */
 function yearFortune(s, year) {
   const G = ENGINE.GAN, J = ENGINE.JI;

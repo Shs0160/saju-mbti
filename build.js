@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const engine = fs.readFileSync('engine.js', 'utf8').replace(/if \(typeof module[\s\S]*$/, '')
-  + '\nconst ENGINE = { GAN, JI, OHENG, buildSaju, tenGod, lunarMonthLength, leapMonthOf, solarToLunar, lunarToSolar };\n';
+  + '\nconst ENGINE = { GAN, JI, OHENG, buildSaju, tenGod, lunarMonthLength, leapMonthOf, solarToLunar, lunarToSolar, twelveStage, monthPillars, gregorianToJDN };\n';
 const content = fs.readFileSync('content.js', 'utf8');
 const app = fs.readFileSync('app.js', 'utf8');
 

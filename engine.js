@@ -580,9 +580,50 @@ function analyze(pillars, dGan, unknownTime) {
   };
 }
 
+/* ---------- 십이운성(十二運星) ----------
+   일간이 각 지지에서 갖는 기운의 단계. 양간은 순행, 음간은 역행한다.
+   갑木 장생 亥 / 을木 장생 午 / 병戊 장생 寅 / 정己 장생 酉
+   경金 장생 巳 / 신金 장생 子 / 임水 장생 申 / 계水 장생 卯 */
+const STAGES = ['장생', '목욕', '관대', '건록', '제왕', '쇠', '병', '사', '묘', '절', '태', '양'];
+const JANGSAENG = { 0: 11, 1: 6, 2: 2, 3: 9, 4: 2, 5: 9, 6: 5, 7: 0, 8: 8, 9: 3 };
+
+function twelveStage(dayGanIdx, jiIdx) {
+  const start = JANGSAENG[dayGanIdx];
+  const yin = GAN[dayGanIdx].yin;
+  const i = yin ? ((start - jiIdx) % 12 + 12) % 12 : ((jiIdx - start) % 12 + 12) % 12;
+  return STAGES[i];
+}
+
+/* ---------- 월운: 그 해 입춘부터 12개월의 월주 ---------- */
+function monthPillars(year) {
+  const terms = [];
+  for (const yy of [year, year + 1]) {
+    for (const t of solarTermsOfYear(yy)) {
+      if (JEOL_TO_BRANCH[t.name] !== undefined) terms.push({ ...t });
+    }
+  }
+  terms.sort((a, b) => a.jd - b.jd);
+  const ipchun = terms.find(t => t.name === '입춘' && t.jd > gregorianToJDN(year, 1, 20) - 0.5);
+  const from = terms.indexOf(ipchun);
+
+  const yearIdx = ((year - 1984) % 60 + 60) % 60;
+  const yGan = yearIdx % 10;
+  const out = [];
+  for (let k = 0; k < 12; k++) {
+    const t = terms[from + k];
+    const ji = JEOL_TO_BRANCH[t.name];
+    const offset = ((ji - 2) % 12 + 12) % 12;
+    const gan = ((yGan % 5) * 2 + 2 + offset) % 10;
+    const kst = t.jd + 9 / 24;
+    const g = jdnToGregorian(Math.floor(kst + 0.5));
+    out.push({ term: t.name, gan, ji, month: g.m, day: g.d, year: g.y, jd: t.jd });
+  }
+  return out;
+}
+
 if (typeof module !== 'undefined') {
   module.exports = {
     GAN, JI, OHENG, SAENG, GEUK, SOLAR_TERMS, buildSaju, solarTermsOfYear,
-    lunarToSolar, solarToLunar, lunarMonthLength, leapMonthOf, gregorianToJDN, jdnToGregorian, tenGod, newMoonJD,
+    lunarToSolar, solarToLunar, lunarMonthLength, leapMonthOf, twelveStage, monthPillars, STAGES, gregorianToJDN, jdnToGregorian, tenGod, newMoonJD,
   };
 }

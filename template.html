@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Noto+Serif+KR:wght@500;600;700&display=swap">
 
 <style>
-/* ===== 한지·목판 활자 — 라이트 전용 ===== */
+/* ===== 한지·목판 활자 (라이트 전용) ===== */
 :root{
   --paper:#F8F2E2; --paper-2:#F1E8D2; --surface:#FDFAF0;
   --rule:#D6C8A6; --rule-soft:#E6DBBF; --frame:#5A4A32;
@@ -64,7 +64,7 @@ header p{
   padding-top:17px; border-top:1px solid var(--rule);
 }
 
-/* ===== 광곽(匡郭) — 사주쌍변 ===== */
+/* ===== 광곽(匡郭) 사주쌍변 ===== */
 .card:not(.sec){
   background:var(--surface); border:2px solid var(--frame); border-radius:0;
   box-shadow:inset 0 0 0 2px var(--surface), inset 0 0 0 3px var(--rule);
@@ -242,7 +242,7 @@ details.adv .stack{margin-top:16px}
   color:var(--ink-2); margin:21px 0 0; padding-top:18px; border-top:1px solid var(--rule);
 }
 
-/* ===== 명식표 — 계선(界線) 격자 ===== */
+/* ===== 명식표 계선(界線) 격자 ===== */
 .wongook{
   display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
   background:var(--frame); border:1px solid var(--frame); overflow:hidden;
@@ -268,7 +268,32 @@ details.adv .stack{margin-top:16px}
 .pil .glyph .kr{display:block; font-size:10.5px; color:var(--muted); margin-top:2px}
 .pil .glyph .god{display:block; font-size:10.5px; color:var(--ink-2); margin-top:3px}
 .pil .divide{height:1px; background:var(--rule); margin:0 10px}
-.pil .hid{font-size:9.5px; color:var(--muted); padding:0 2px 9px}
+.pil .hid{font-size:9.5px; color:var(--muted); padding:0 2px 7px}
+.pil .stage{
+  font-size:9.5px; color:var(--muted); padding:4px 2px 5px;
+  border-top:1px solid var(--rule); background:var(--paper-2);
+}
+.pil.me .stage{color:var(--red-deep); background:var(--red-soft)}
+
+/* 월운 */
+.months{
+  display:flex; flex-direction:column; gap:1px; margin-top:15px;
+  background:var(--rule); border:1px solid var(--frame);
+}
+.mrow{
+  display:grid; grid-template-columns:38px 40px 1fr; gap:9px; align-items:baseline;
+  background:var(--surface); padding:9px 11px;
+}
+.mrow.now{background:var(--red-soft)}
+.mrow .m{font-size:11.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+.mrow.now .m{color:var(--red-deep)}
+.mrow .gz{font-size:14px; color:var(--ink); line-height:1.3}
+.mrow.now .gz{color:var(--red-deep)}
+.mrow .l{
+  font-family:"Noto Serif KR",serif; font-weight:500; font-size:12.5px;
+  line-height:1.7; color:var(--ink-2);
+}
+.mrow .l b{color:var(--ink); font-weight:600}
 .meta-line{display:flex; flex-wrap:wrap; gap:5px; margin-top:14px}
 
 .obar{display:flex; height:12px; overflow:hidden; border:1px solid var(--frame)}

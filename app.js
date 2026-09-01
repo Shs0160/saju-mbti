@@ -206,6 +206,7 @@ function render(s, inp) {
       <div class="divide"></div>
       <div class="glyph"><span class="ch hanja">${j.h}</span><span class="kr">${j.k}</span><span class="god">${jGod}</span></div>
       <div class="hid">${j.hidden.map(h => h[0]).join('·')}</div>
+      <div class="stage">${twelveStage(s.dayGan, p.ji)}</div>
     </div>`;
   }).join('');
 
@@ -247,6 +248,66 @@ function render(s, inp) {
       <div class="okey">${keyHtml}</div>
     </section>`;
 
+  /* 새 콘텐츠 */
+  const stages = lifeStages(s);
+  const health = healthReport(s);
+  const job = GYEOK_JOB[rep.gyeok];
+  const dstory = daeunStory(s, age);
+  const todayJD = gregorianToJDN(NOW.getFullYear(), NOW.getMonth() + 1, NOW.getDate()) - 0.5;
+  const months = monthlyFortune(s, NOW.getFullYear(), todayJD);
+
+  const aptitudeSec = `
+    <section class="card sec" style="--sec:var(--el-geum)">
+      <span class="tag">적성</span>
+      <h3>${job.tag}</h3>
+      <p>월지에서 잡히는 격국이 <b>${rep.gyeok}</b>입니다. 사주에서 사람의 틀을 가장 크게 정하는 자리이고, 어떤 판에 놓였을 때 가장 자기답게 움직이는지를 보여줍니다.</p>
+      <p>${job.line}</p>
+      <p>다만 격국은 직업의 이름이 아니라 <b>일하는 방식의 결</b>입니다. 같은 회사 안에서도 이 결에 맞는 자리로 옮기면 훨씬 덜 지칩니다.</p>
+    </section>`;
+
+  const healthSec = `
+    <section class="card sec" style="--sec:var(--el-mok)">
+      <span class="tag">몸</span>
+      <h3>기운이 몰리는 곳과 비는 곳</h3>
+      <p>사주에서 오행은 몸의 장부와 이어집니다. 넘치는 쪽과 모자란 쪽 모두 신호를 보냅니다.</p>
+      <p><b>${health.top}이 가장 두껍습니다.</b> ${health.topH.organ} 쪽입니다. ${health.topH.over}</p>
+      <p><b>${health.low}이 가장 얇습니다.</b> ${health.lowH.organ} 쪽입니다. ${health.lowH.under}</p>
+      <p class="soothe">몸이 정해져 있다는 뜻은 아닙니다. 어느 쪽이 먼저 신호를 보내는지 알아두면, 무리하기 전에 한 박자 먼저 쉴 수 있어요. 그 정도로 쓰면 충분합니다.</p>
+    </section>`;
+
+  const stageSec = `
+    <section class="card sec" style="--sec:var(--el-su)">
+      <span class="tag">십이운성</span>
+      <h3>기운의 사계절</h3>
+      <p>일간이 각 기둥의 지지에서 갖는 힘의 단계를 십이운성이라 합니다. 씨앗에서 자라 무성해졌다가 갈무리되는 흐름이고, 네 기둥이 인생의 사계절에 대응합니다.</p>
+      ${stages.map(x => `<p><b>${x.label} · ${x.span}</b><br>${x.ji.k}(${x.ji.h})에서 <b>${x.stage}</b>, ${x.desc.short}. ${x.desc.line}</p>`).join('')}
+    </section>`;
+
+  const monthSec = `
+    <section class="card sec" style="--sec:var(--el-hwa)">
+      <span class="tag">${NOW.getFullYear()}년 월운</span>
+      <h3>달마다 부는 바람</h3>
+      <p>절기를 기준으로 나눈 열두 달입니다. 표시된 달이 지금 지나는 구간이에요.</p>
+      <div class="months">
+        ${months.map(m => `<div class="mrow ${m.isNow ? 'now' : ''}">
+          <span class="m">${m.label}</span>
+          <b class="gz hanja">${m.gz}</b>
+          <span class="l"><b>${m.god}${m.good ? ' ◎' : ''}</b> ${m.line}</span>
+        </div>`).join('')}
+      </div>
+      <p style="margin-top:16px">◎ 표시는 당신에게 부족한 기운(용신 ${s.yongshin})이 들어오는 달입니다. 미뤄둔 일을 꺼내기 좋아요.</p>
+    </section>`;
+
+  const daeunSec = `<section class="card sec" style="--sec:var(--el-geum)">
+      <span class="tag">대운</span>
+      <h3>10년마다 바뀌는 판</h3>
+      <p>${s.daeun[0].age}세부터 ${s.forward ? '순행' : '역행'}으로 흐릅니다. 아래에서 강조된 칸이 ${who}이 지금(만 ${age}세) 지나고 있는 자리예요.</p>
+      ${dstory.now ? `<p><b>지금 ${dstory.now.age}세 대운 · ${dstory.now.gzk}(${dstory.now.gz}) · ${dstory.now.god}</b><br>${dstory.now.line}</p>
+      <p>이 10년의 십이운성은 <b>${dstory.now.stage}</b>입니다. ${STAGE_DESC[dstory.now.stage].line}</p>` : ''}
+      ${dstory.next ? `<p><b>다음 ${dstory.next.age}세 대운 · ${dstory.next.gzk}(${dstory.next.gz}) · ${dstory.next.god}</b><br>${dstory.next.line}</p>` : ''}
+      <div class="daeun" style="margin-top:18px">${daeunHtml}</div>
+    </section>`;
+
   const secs = rep.sections;
   const head = secs[0], rest = secs.slice(1);
 
@@ -268,6 +329,12 @@ function render(s, inp) {
     ${sectionCard(head)}
     ${wongook}
     ${rest.map(sectionCard).join('')}
+    ${aptitudeSec}
+    ${healthSec}
+
+    <div class="eomi"><i></i></div>
+    ${stageSec}
+    ${daeunSec}
 
     <section class="card sec" style="--sec:var(--el-su)">
       <span class="tag">${NOW.getFullYear()}년 운</span>
@@ -278,6 +345,10 @@ function render(s, inp) {
       </div>
       ${fort.lines.map(p => `<p>${p}</p>`).join('')}
     </section>
+
+    ${monthSec}
+
+    <div class="eomi"><i></i></div>
 
     <section class="card sec" style="--sec:var(--el-hwa)">
       <span class="tag">궁합</span>
@@ -318,13 +389,6 @@ function render(s, inp) {
       <h3>원국에 박힌 특수 기운</h3>
       ${s.shinsal.map(k => `<p><b>${k}</b>. ${SHINSAL_DESC[k]}</p>`).join('')}
     </section>` : ''}
-
-    <section class="card sec" style="--sec:var(--el-geum)">
-      <span class="tag">대운</span>
-      <h3>10년마다 바뀌는 판</h3>
-      <p style="margin-bottom:15px">${s.daeun[0].age}세부터 ${s.forward ? '순행' : '역행'}으로 흐릅니다. 강조된 칸이 ${who}이 지금(만 ${age}세) 지나고 있는 대운이에요.</p>
-      <div class="daeun">${daeunHtml}</div>
-    </section>
 
     <div class="eomi"><i></i></div>
     <div class="actions">
