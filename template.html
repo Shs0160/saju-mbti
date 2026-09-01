@@ -474,6 +474,47 @@ details.adv .stack{margin-top:16px}
 .job{background:var(--surface); padding:12px 11px; text-align:center}
 .job b{display:block; font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:14.5px; color:var(--ink); line-height:1.4}
 .job span{display:block; font-size:10px; color:var(--muted); margin-top:4px}
+
+/* ===== 차트 전용 오방색 (색각 검증 통과) ===== */
+:root{
+  --ch-mok:#0F8A6E; --ch-hwa:#B93A2B; --ch-to:#B5820F; --ch-geum:#7E8C99; --ch-su:#3A5F9E;
+}
+
+/* ===== 오행 상생상극도 ===== */
+.ohd{margin-top:18px; padding-top:16px; border-top:1px solid var(--rule)}
+.ohd svg{display:block; width:100%; max-width:280px; margin:0 auto; height:auto}
+.oh-ring{fill:none; stroke:var(--rule); stroke-width:1.5}
+.oh-geuk{stroke:var(--rule); stroke-width:1; stroke-dasharray:3 3}
+.oh-area{fill:var(--red); fill-opacity:.10; stroke:var(--red); stroke-width:1.5; stroke-opacity:.5}
+.oh-lab{font-family:"Noto Serif KR",serif; font-weight:700; font-size:16px}
+.oh-lab.on{font-size:19px}
+.oh-yong{fill:var(--red-soft); stroke:var(--red); stroke-width:1.5}
+.oh-num{font-family:"Gowun Dodum",sans-serif; font-size:10px; fill:var(--muted)}
+.oh-key{display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top:6px; font-size:10.5px; color:var(--muted)}
+.oh-key span{display:flex; align-items:center; gap:5px}
+.k-ring{width:14px; height:0; border-top:1.5px solid var(--rule)}
+.k-geuk{width:14px; height:0; border-top:1px dashed var(--rule)}
+
+/* ===== 육친 배치 ===== */
+.fam{border:1px solid var(--frame); background:var(--surface)}
+.fam-r{display:grid; grid-template-columns:72px 52px 1fr; gap:8px; align-items:baseline; padding:10px 12px; border-bottom:1px solid var(--rule-soft)}
+.fam-r:last-child{border-bottom:0}
+.fam-r.none{background:var(--paper-2)}
+.f-l{font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:14px; color:var(--ink)}
+.fam-r.none .f-l{color:var(--muted)}
+.f-g{font-size:11px; color:var(--red)}
+.fam-r.none .f-g{color:var(--muted)}
+.f-a{font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums}
+.fam-r.none .f-a{color:var(--muted)}
+
+/* ===== 재물 연도 ===== */
+.wy{margin-top:16px; padding-top:14px; border-top:1px solid var(--rule)}
+.wy-t{font-size:11px; letter-spacing:.1em; color:var(--muted); margin-bottom:10px}
+.wy-i{display:flex; align-items:baseline; gap:10px; padding:7px 0; border-bottom:1px solid var(--rule-soft)}
+.wy-i:last-child{border-bottom:0}
+.wy-i b{font-size:13px; color:var(--ink); font-variant-numeric:tabular-nums; width:42px}
+.wy-i .hanja{font-size:14px; color:var(--red-deep); width:34px}
+.wy-i em{font-style:normal; font-size:12px; color:var(--ink-2)}
 </style>
 
 <div class="wrap">

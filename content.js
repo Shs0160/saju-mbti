@@ -1040,3 +1040,91 @@ function marryWindow(s, age) {
     .filter(w => w.to >= 15 && w.from <= 55);
   return { grp, spans, age, min: 15, max: 55 };
 }
+
+/* ============================================================
+   인간관계 · 재물 시기 · 오행도 · 육친 배치
+   ============================================================ */
+
+/* 오행이 만드는 사람의 결 */
+const EL_PEOPLE = {
+  목: { good: '계획을 세우고 밀어주는 사람', bad: '벌여만 놓고 수습을 안 하는 사람', kw: ['추진', '성장', '기획'] },
+  화: { good: '밝고 표현이 많은 사람', bad: '들떴다가 금방 식는 사람', kw: ['표현', '온기', '활기'] },
+  토: { good: '묵묵하고 흔들리지 않는 사람', bad: '고집이 굳어 안 움직이는 사람', kw: ['안정', '신뢰', '버팀'] },
+  금: { good: '원칙이 분명하고 딱 끊는 사람', bad: '말에 날이 서 있는 사람', kw: ['결단', '기준', '정리'] },
+  수: { good: '눈치 빠르고 유연한 사람', bad: '속을 알 수 없고 재기만 하는 사람', kw: ['지혜', '유연', '통찰'] },
+};
+
+/* 십신 우세가 만드는 첫인상 */
+const DOM_IMPRESSION = {
+  비겁: { face: '만만치 않아 보이는 사람', line: '먼저 굽히지 않는 기색이 있어서, 처음엔 다가가기 어렵다는 말을 듣습니다. 친해지면 정반대인 걸 알게 되죠.' },
+  식상: { face: '재미있는 사람', line: '말과 표정이 살아 있어서 자리에 활기가 돕니다. 대신 속을 다 보여준다는 오해도 같이 받아요.' },
+  재성: { face: '능력 있어 보이는 사람', line: '현실 감각이 밖으로 드러나서 일 잘한다는 인상을 줍니다. 계산적이라는 오해가 따라오기도 해요.' },
+  관성: { face: '반듯한 사람', line: '예의와 선이 분명해서 믿음직하다는 말을 듣습니다. 그만큼 편하게 대하기 어렵다는 뜻이기도 하고요.' },
+  인성: { face: '차분한 사람', line: '한 박자 늦게 반응해서 어른스럽다는 인상을 줍니다. 속을 모르겠다는 말도 자주 듣죠.' },
+};
+
+/* 육친이 원국 어느 자리에 있는지 */
+function familyMap(s) {
+  const G = ENGINE.GAN, J = ENGINE.JI;
+  const male = s.gender === 'M';
+  const slots = [];
+  const pos = ['년', '월', '일', '시'];
+  const keys = ['year', 'month', 'day', 'hour'];
+  const found = (names) => {
+    const out = [];
+    keys.forEach((k, i) => {
+      const p = s.pillars[k]; if (!p) return;
+      /* 일간은 '나' 자신이라 육친으로 세지 않는다 */
+      const g = k === 'day' ? null : ENGINE.tenGod(s.dayGan, p.gan);
+      if (g && names.includes(g)) out.push(pos[i] + '간');
+      const hid = J[p.ji].hidden;
+      const jg = ENGINE.tenGod(s.dayGan, G.findIndex(x => x.k === hid[hid.length - 1][0]));
+      if (names.includes(jg)) out.push(pos[i] + '지');
+    });
+    return out;
+  };
+  const add = (label, god, names) => {
+    const at = found(names);
+    slots.push({ label, god, at, n: at.length });
+  };
+  add('어머니', '인성', ['정인', '편인']);
+  add('아버지', '편재', ['편재']);
+  add('형제·또래', '비겁', ['비견', '겁재']);
+  add(male ? '아내' : '남편', male ? '재성' : '관성', male ? ['정재', '편재'] : ['정관', '편관']);
+  add('자식', male ? '관성' : '식상', male ? ['정관', '편관'] : ['식신', '상관']);
+  return slots;
+}
+
+/* 재물이 도는 시기: 재성 대운 구간 + 앞으로 10년의 세운 */
+function wealthTiming(s, age, year) {
+  const G = ENGINE.GAN, J = ENGINE.JI;
+  const spans = s.daeun
+    .filter(d => GOD_GROUP_OF[ENGINE.tenGod(s.dayGan, d.gan)] === '재성')
+    .map(d => ({ from: d.age, to: d.age + 9 }))
+    .filter(w => w.to >= 20 && w.from <= 70);
+  const years = [];
+  for (let y = year; y < year + 10; y++) {
+    const idx = ((y - 1984) % 60 + 60) % 60;
+    const gan = idx % 10, ji = idx % 12;
+    const god = ENGINE.tenGod(s.dayGan, gan);
+    const grp = GOD_GROUP_OF[god];
+    if (grp === '재성' || grp === '식상') {
+      years.push({ y, gz: G[gan].h + J[ji].h, god, grp });
+    }
+  }
+  return { spans, years, age, min: 20, max: 70 };
+}
+
+/* 오행 상생상극도 좌표. 시계방향 목→화→토→금→수 가 상생 */
+function ohaengDiagram(s) {
+  const order = ['목', '화', '토', '금', '수'];
+  const max = Math.max(...order.map(k => s.oheng[k])) || 1;
+  const R = 74, cx = 120, cy = 108;
+  const pt = (i, r) => {
+    const a = (-90 + i * 72) * Math.PI / 180;
+    return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+  };
+  const outer = order.map((_, i) => pt(i, R));
+  const vals = order.map((k, i) => pt(i, Math.max(10, (s.oheng[k] / max) * R)));
+  return { order, outer, vals, R, cx, cy, max, pt };
+}

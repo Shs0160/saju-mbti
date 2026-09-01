@@ -112,6 +112,85 @@ function run() {
 }
 
 /* ---------- 조각 렌더러 ---------- */
+/* ---------- 오행 상생상극도 ---------- */
+const CH_VAR = { 목: '--ch-mok', 화: '--ch-hwa', 토: '--ch-to', 금: '--ch-geum', 수: '--ch-su' };
+const OH_HANJA2 = { 목: '木', 화: '火', 토: '土', 금: '金', 수: '水' };
+
+function ohaengSvg(s) {
+  const d = ohaengDiagram(s);
+  const p = (a) => a.map(v => v[0].toFixed(1) + ',' + v[1].toFixed(1)).join(' ');
+  /* 상극: 목→토, 토→수, 수→화, 화→금, 금→목 */
+  const geuk = [[0, 2], [2, 4], [4, 1], [1, 3], [3, 0]];
+  const labels = d.order.map((k, i) => {
+    const [x, y] = d.pt(i, d.R + 22);
+    const on = k === s.yongshin;
+    return `${on ? `<circle cx="${x.toFixed(1)}" cy="${(y - 1).toFixed(1)}" r="15" class="oh-yong"/>` : ''}
+      <text x="${x.toFixed(1)}" y="${(y + 5).toFixed(1)}" text-anchor="middle"
+      class="oh-lab${on ? ' on' : ''}" style="fill:var(${CH_VAR[k]})">${OH_HANJA2[k]}</text>
+      <text x="${x.toFixed(1)}" y="${(y + 19).toFixed(1)}" text-anchor="middle" class="oh-num">${s.oheng[k].toFixed(1)}${on ? ' 용신' : ''}</text>`;
+  }).join('');
+  const dots = d.vals.map((v, i) =>
+    `<circle cx="${v[0].toFixed(1)}" cy="${v[1].toFixed(1)}" r="4.5"
+      style="fill:var(${CH_VAR[d.order[i]]})" stroke="var(--surface)" stroke-width="2"/>`).join('');
+  return `<div class="ohd">
+    <svg viewBox="0 0 240 216" role="img" aria-label="오행 분포와 상생상극 관계도">
+      <polygon points="${p(d.outer)}" class="oh-ring"/>
+      ${geuk.map(([a, b]) =>
+        `<line x1="${d.outer[a][0].toFixed(1)}" y1="${d.outer[a][1].toFixed(1)}"
+               x2="${d.outer[b][0].toFixed(1)}" y2="${d.outer[b][1].toFixed(1)}" class="oh-geuk"/>`).join('')}
+      <polygon points="${p(d.vals)}" class="oh-area"/>
+      ${dots}${labels}
+    </svg>
+    <div class="oh-key">
+      <span><b class="k-ring"></b>바깥 오각형은 상생(相生) 순환</span>
+      <span><b class="k-geuk"></b>안쪽 별은 상극(相剋)</span>
+    </div>
+  </div>`;
+}
+
+/* ---------- 재물 시기 ---------- */
+function wealthTimeline(w) {
+  const pct = (a) => ((a - w.min) / (w.max - w.min)) * 100;
+  const bars = w.spans.map(sp => {
+    const from = Math.max(sp.from, w.min), to = Math.min(sp.to, w.max);
+    return `<b class="tl-bar" style="left:${pct(from)}%;width:${pct(to) - pct(from)}%"></b>
+            <span class="tl-lab" style="left:${pct(from)}%">${sp.from}세</span>`;
+  }).join('');
+  const nowPct = w.age >= w.min && w.age <= w.max ? pct(w.age) : null;
+  return `<div class="tl">
+    <div class="tl-t">재성이 드는 대운 · 돈이 크게 도는 구간</div>
+    <div class="tl-track">${bars}${nowPct != null ? `<b class="tl-now" style="left:${nowPct}%"></b>` : ''}</div>
+    <div class="tl-ax"><span>20세</span><span>45세</span><span>70세</span></div>
+    ${w.spans.length ? '' : '<p class="tl-none">10년 단위 흐름에서 재성이 크게 드는 구간은 없습니다. 큰 한 방보다 여러 통로를 만들어두는 쪽이 맞아요.</p>'}
+    ${w.years.length ? `<div class="wy">
+      <div class="wy-t">앞으로 10년 중 돈이 움직이는 해</div>
+      ${w.years.map(y => `<div class="wy-i"><b>${y.y}</b><span class="hanja">${y.gz}</span><em>${y.god}</em></div>`).join('')}
+    </div>` : ''}
+  </div>`;
+}
+
+/* ---------- 육친 배치 ---------- */
+function familyTable(slots) {
+  return `<div class="fam">
+    ${slots.map(x => `<div class="fam-r${x.n ? '' : ' none'}">
+      <span class="f-l">${x.label}</span>
+      <span class="f-g">${x.god}</span>
+      <span class="f-a">${x.n ? x.at.join(' · ') : '자리 없음'}</span>
+    </div>`).join('')}
+  </div>`;
+}
+
+/* ---------- 인간관계 카드 ---------- */
+function socialCards(s, dom) {
+  const good = EL_PEOPLE[s.yongshin], bad = EL_PEOPLE[s.strongest];
+  const imp = DOM_IMPRESSION[dom];
+  return `<div class="mcards">
+    ${matchCard('편한 사람', good.good, good.kw, `당신에게 모자란 ${s.yongshin}의 기운을 가진 쪽입니다. 애써 맞추지 않아도 대화가 굴러가요.`)}
+    ${matchCard('피곤한 사람', bad.bad, EL_PEOPLE[s.strongest].kw, `이미 두꺼운 ${s.strongest}을 더 얹는 쪽이라 같이 과열됩니다. 나쁜 사람이라는 뜻이 아니라 브레이크가 없다는 뜻이에요.`)}
+    ${matchCard('남들이 보는 나', imp.face, [dom], imp.line)}
+  </div>`;
+}
+
 /* ---------- 시각 블록 렌더러 ---------- */
 function matchCard(title, name, kw, line) {
   return `<div class="mcard">
@@ -230,7 +309,7 @@ function pairCard(a, b, extraA, extraB) {
     </section>`;
 }
 
-function sectionCard(x) {
+function sectionCard(x, extra) {
   const last = x.body.length - 1;
   const hue = x.hue ? ` style="--sec:var(${HUE_VAR[x.hue]})"` : '';
   const paras = x.body.map((p, i) =>
@@ -240,6 +319,7 @@ function sectionCard(x) {
       <span class="tag">${x.tag}</span>
       <h3>${x.title}</h3>
       ${paras}
+      ${extra || ''}
       ${x.chips ? `<div class="chips">${x.chips.map(c => `<span class="pill">${c}</span>`).join('')}</div>` : ''}
     </section>`;
 }
@@ -277,10 +357,10 @@ function render(s, inp) {
 
   const total = Object.values(s.oheng).reduce((a, b) => a + b, 0) || 1;
   const barHtml = OHENG.map(e =>
-    `<i style="width:${(s.oheng[e] / total * 100).toFixed(2)}%;background:var(${EL_VAR[e]})"></i>`).join('');
+    `<i style="width:${(s.oheng[e] / total * 100).toFixed(2)}%;background:var(${CH_VAR[e]})"></i>`).join('');
   const OH_HANJA = { 목: '木', 화: '火', 토: '土', 금: '金', 수: '水' };
   const keyHtml = OHENG.map(e =>
-    `<span><em style="color:var(${EL_VAR[e]})">${OH_HANJA[e]}</em>${e} ${s.oheng[e].toFixed(1)}</span>`).join('');
+    `<span><em style="color:var(${CH_VAR[e]})">${OH_HANJA[e]}</em>${e} ${s.oheng[e].toFixed(1)}</span>`).join('');
 
   const born = new Date(s.solar.y, s.solar.m - 1, s.solar.d);
   let age = NOW.getFullYear() - born.getFullYear();
@@ -311,6 +391,7 @@ function render(s, inp) {
       </div>
       <div class="obar" style="margin-top:18px">${barHtml}</div>
       <div class="okey">${keyHtml}</div>
+      ${ohaengSvg(s)}
     </section>`;
 
   /* 새 콘텐츠 */
@@ -322,6 +403,8 @@ function render(s, inp) {
   const months = monthlyFortune(s, NOW.getFullYear(), todayJD);
 
   const picks = jobPicks(s, rep.gyeok);
+  const wt = wealthTiming(s, age, NOW.getFullYear());
+  const fam = familyMap(s);
 
   const aptitudeSec = `
     <section class="card sec" style="--sec:var(--el-geum)">
@@ -377,6 +460,12 @@ function render(s, inp) {
       <div class="daeun" style="margin-top:18px">${daeunHtml}</div>
     </section>`;
 
+  const extraFor = {
+    social: `<div class="blk-t">사람을 고르는 기준</div>` + socialCards(s, rep.dom),
+    parents: `<div class="blk-t">육친이 앉은 자리</div>` + familyTable(fam),
+    work: `<div class="blk-t">돈이 도는 시기</div>` + wealthTimeline(wt),
+  };
+
   const secs = rep.sections;
   const head = secs[0], rest = secs.slice(1);
 
@@ -416,7 +505,7 @@ function render(s, inp) {
     ${compareChart(rep, inp.mbti)}
     ${sectionCard(head)}
     ${wongook}
-    ${rest.map(x => x.id === 'love' ? lovePair : x.id === 'marriage' ? '' : sectionCard(x)).join('')}
+    ${rest.map(x => x.id === 'love' ? lovePair : x.id === 'marriage' ? '' : sectionCard(x, extraFor[x.id])).join('')}
     ${aptitudeSec}
     ${healthSec}
 
