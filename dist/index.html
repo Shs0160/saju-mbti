@@ -519,16 +519,28 @@ details.adv .stack{margin-top:16px}
 .k-geuk{width:14px; height:0; border-top:1px dashed var(--rule)}
 
 /* ===== 육친 배치 ===== */
+.blk-note{
+  font-family:"Noto Serif KR",serif; font-weight:500; font-size:12.5px; line-height:1.8;
+  color:var(--muted); margin:0 0 12px;
+}
 .fam{border:1px solid var(--frame); background:var(--surface)}
-.fam-r{display:grid; grid-template-columns:72px 52px 1fr; gap:8px; align-items:baseline; padding:10px 12px; border-bottom:1px solid var(--rule-soft)}
+.fam-r{padding:12px 13px; border-bottom:1px solid var(--rule)}
 .fam-r:last-child{border-bottom:0}
-.fam-r.none{background:var(--paper-2)}
-.f-l{font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:14px; color:var(--ink)}
-.fam-r.none .f-l{color:var(--muted)}
-.f-g{font-size:11px; color:var(--red)}
-.fam-r.none .f-g{color:var(--muted)}
-.f-a{font-size:12px; color:var(--ink-2); font-variant-numeric:tabular-nums}
-.fam-r.none .f-a{color:var(--muted)}
+.f-top{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap}
+.f-l{font-family:"Nanum Myeongjo",serif; font-weight:800; font-size:14.5px; color:var(--ink)}
+.f-g{font-size:11px; color:var(--muted)}
+.f-a{font-size:12px; color:var(--ink-2); flex:1}
+.f-lv{font-size:10.5px; padding:1px 8px; border:1px solid var(--rule); color:var(--muted)}
+.f-d{
+  margin:8px 0 0; font-family:"Noto Serif KR",serif; font-weight:500;
+  font-size:13px; line-height:1.8; color:var(--ink-2);
+}
+/* 강도 */
+.fam-r.lv0{background:var(--paper-2)}
+.fam-r.lv0 .f-l,.fam-r.lv0 .f-a{color:var(--muted)}
+.fam-r.lv2 .f-lv{border-color:var(--red); color:var(--red)}
+.fam-r.lv2 .f-l{color:var(--red-deep)}
+.fam-r.lv3 .f-lv{border-color:var(--ch-to); color:var(--ch-to)}
 
 /* ===== 재물 연도 ===== */
 .wy{margin-top:16px; padding-top:14px; border-top:1px solid var(--rule)}
@@ -2367,6 +2379,42 @@ const DOM_IMPRESSION = {
   인성: { face: '차분한 사람', line: '한 박자 늦게 반응해서 어른스럽다는 인상을 줍니다. 속을 모르겠다는 말도 자주 듣죠.' },
 };
 
+
+/* 육친이 제자리(宮)에 있는지로 관계의 결을 읽는다.
+   어머니·아버지·형제는 월주(부모궁), 배우자는 일지, 자식은 시주가 제자리. */
+const FAM_LINE = {
+  어머니: {
+    없음: '기대기보다 일찍 스스로 판단하며 자랐습니다. 정이 없었다는 뜻이 아니라, 허락을 구할 대상이 곁에 없었다는 뜻이에요.',
+    보통: '자리는 있지만 부모궁에서 비켜 있습니다. 가까운 듯 거리가 있는 관계예요.',
+    깊음: '부모궁에 제대로 앉아 있습니다. 어머니의 기준이 지금까지 크게 남아 있어요.',
+    과다: '어머니 자리가 여럿입니다. 보살핌이 넉넉했던 만큼, 어느 시기엔 간섭으로 느껴졌을 거예요.',
+  },
+  아버지: {
+    없음: '아버지의 존재감이 옅었거나, 일찍부터 아버지 없이 판단하는 법을 익혔습니다.',
+    보통: '자리는 있지만 부모궁 밖입니다. 영향은 받되 닮지는 않은 쪽이에요.',
+    깊음: '부모궁에 앉아 있어 아버지의 방식이 그대로 몸에 남았습니다.',
+    과다: '아버지 자리가 여럿입니다. 현실과 돈에 일찍 눈뜬 대신, 그만큼 짐도 일찍 졌어요.',
+  },
+  '형제·또래': {
+    없음: '내 편에 대한 갈증이 있습니다. 혼자 결정하고 혼자 감당하는 편이에요.',
+    보통: '적당한 거리의 또래 관계입니다. 크게 기대지도, 크게 부딪히지도 않아요.',
+    깊음: '형제나 또래가 인생에 실질적으로 작용합니다. 든든한 만큼 비교도 따라와요.',
+    과다: '주변에 사람이 많은 만큼 경쟁도 많습니다. 나눠야 할 몫이 늘 있어요.',
+  },
+  배우자: {
+    없음: '배우자 자리가 비어 있습니다. 인연이 늦거나 남들과 다른 경로로 옵니다.',
+    보통: '자리는 있지만 배우자궁 밖입니다. 만남은 있되 정착까지 시간이 걸려요.',
+    깊음: '배우자궁에 제대로 앉아 있습니다. 인연이 깊고 관계가 오래 갑니다.',
+    과다: '인연이 여럿 스쳐갑니다. 마음이 없는 게 아니라 선택이 늘 숙제예요.',
+  },
+  자식: {
+    없음: '자식 자리가 비어 있습니다. 늦게 두거나, 자식이 아닌 것에 그 마음을 쏟는 경우가 많아요.',
+    보통: '자리는 있지만 자식궁 밖입니다. 인연은 있되 거리가 생기기 쉬워요.',
+    깊음: '자식궁에 앉아 있습니다. 말년에 자식이 힘이 되는 구조예요.',
+    과다: '자식 자리가 여럿입니다. 챙길 것이 많아 늘 분주해요.',
+  },
+};
+
 /* 육친이 원국 어느 자리에 있는지 */
 function familyMap(s) {
   const G = ENGINE.GAN, J = ENGINE.JI;
@@ -2387,15 +2435,18 @@ function familyMap(s) {
     });
     return out;
   };
-  const add = (label, god, names) => {
+  const add = (label, god, names, palace, key) => {
     const at = found(names);
-    slots.push({ label, god, at, n: at.length });
+    const n = at.length;
+    const inOwn = at.some(a => a[0] === palace);
+    const level = n === 0 ? '없음' : n >= 3 ? '과다' : inOwn ? '깊음' : '보통';
+    slots.push({ label, god, at, n, level, palace, line: FAM_LINE[key][level] });
   };
-  add('어머니', '인성', ['정인', '편인']);
-  add('아버지', '편재', ['편재']);
-  add('형제·또래', '비겁', ['비견', '겁재']);
-  add(male ? '아내' : '남편', male ? '재성' : '관성', male ? ['정재', '편재'] : ['정관', '편관']);
-  add('자식', male ? '관성' : '식상', male ? ['정관', '편관'] : ['식신', '상관']);
+  add('어머니', '인성', ['정인', '편인'], '월', '어머니');
+  add('아버지', '편재', ['편재'], '월', '아버지');
+  add('형제·또래', '비겁', ['비견', '겁재'], '월', '형제·또래');
+  add(male ? '아내' : '남편', male ? '재성' : '관성', male ? ['정재', '편재'] : ['정관', '편관'], '일', '배우자');
+  add('자식', male ? '관성' : '식상', male ? ['정관', '편관'] : ['식신', '상관'], '시', '자식');
   return slots;
 }
 
@@ -2607,12 +2658,17 @@ function wealthTimeline(w) {
 }
 
 /* ---------- 육친 배치 ---------- */
+const FAM_LV = { 없음: 'lv0', 보통: 'lv1', 깊음: 'lv2', 과다: 'lv3' };
 function familyTable(slots) {
   return `<div class="fam">
-    ${slots.map(x => `<div class="fam-r${x.n ? '' : ' none'}">
-      <span class="f-l">${x.label}</span>
-      <span class="f-g">${x.god}</span>
-      <span class="f-a">${x.n ? x.at.join(' · ') : '자리 없음'}</span>
+    ${slots.map(x => `<div class="fam-r ${FAM_LV[x.level]}">
+      <div class="f-top">
+        <span class="f-l">${x.label}</span>
+        <span class="f-g">${x.god}</span>
+        <span class="f-a">${x.n ? x.at.join(' · ') : '자리 없음'}</span>
+        <span class="f-lv">${x.level}</span>
+      </div>
+      <p class="f-d">${x.line}</p>
     </div>`).join('')}
   </div>`;
 }
@@ -2899,7 +2955,7 @@ function render(s, inp) {
 
   const extraFor = {
     social: `<div class="blk-t">사람을 고르는 기준</div>` + socialCards(s, rep.dom),
-    parents: `<div class="blk-t">육친이 앉은 자리</div>` + familyTable(fam),
+    parents: `<div class="blk-t">육친이 앉은 자리</div><p class="blk-note">육친마다 제자리가 있습니다. 부모와 형제는 월주, 배우자는 일지, 자식은 시주예요. 제자리에 있으면 인연이 깊고, 비켜 있으면 거리가 생기고, 없으면 얇습니다.</p>` + familyTable(fam),
     work: `<div class="blk-t">돈이 도는 시기</div>` + wealthTimeline(wt),
   };
 

@@ -170,12 +170,17 @@ function wealthTimeline(w) {
 }
 
 /* ---------- 육친 배치 ---------- */
+const FAM_LV = { 없음: 'lv0', 보통: 'lv1', 깊음: 'lv2', 과다: 'lv3' };
 function familyTable(slots) {
   return `<div class="fam">
-    ${slots.map(x => `<div class="fam-r${x.n ? '' : ' none'}">
-      <span class="f-l">${x.label}</span>
-      <span class="f-g">${x.god}</span>
-      <span class="f-a">${x.n ? x.at.join(' · ') : '자리 없음'}</span>
+    ${slots.map(x => `<div class="fam-r ${FAM_LV[x.level]}">
+      <div class="f-top">
+        <span class="f-l">${x.label}</span>
+        <span class="f-g">${x.god}</span>
+        <span class="f-a">${x.n ? x.at.join(' · ') : '자리 없음'}</span>
+        <span class="f-lv">${x.level}</span>
+      </div>
+      <p class="f-d">${x.line}</p>
     </div>`).join('')}
   </div>`;
 }
@@ -462,7 +467,7 @@ function render(s, inp) {
 
   const extraFor = {
     social: `<div class="blk-t">사람을 고르는 기준</div>` + socialCards(s, rep.dom),
-    parents: `<div class="blk-t">육친이 앉은 자리</div>` + familyTable(fam),
+    parents: `<div class="blk-t">육친이 앉은 자리</div><p class="blk-note">육친마다 제자리가 있습니다. 부모와 형제는 월주, 배우자는 일지, 자식은 시주예요. 제자리에 있으면 인연이 깊고, 비켜 있으면 거리가 생기고, 없으면 얇습니다.</p>` + familyTable(fam),
     work: `<div class="blk-t">돈이 도는 시기</div>` + wealthTimeline(wt),
   };
 
